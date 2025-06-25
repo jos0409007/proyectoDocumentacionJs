@@ -430,9 +430,9 @@
             let listaHtml = document.createElement(tipoLista);
 
             let informacion = {
-                "tipoCreacion":TIPOS.lista,
-                "tipoSelect":tipoLista,
-                "valoresLi":[]
+                "tipoCreacion": TIPOS.lista,
+                "tipoSelect": tipoLista,
+                "valoresLi": []
             }
 
             let inputs = divFormularioEdicion.querySelectorAll("div.miLista >div>input");
@@ -601,40 +601,10 @@
             botonCrearLista.onclick = function () {
 
                 crearListaHtml(divLista, selectLista.value);
-                /*
-
-                let listaHtml = selectLista.value == "ol" ? document.createElement("ol") : document.createElement("ul");
-
-                let inputs = divLista.querySelectorAll("div.miLista >div>input");
-                inputs.forEach(element => {
-                    let li = document.createElement("li");
-                    li.textContent = element.value;
-                    listaHtml.appendChild(li);
-                });
-
-
-                let botonActualizar = crearButton("Actualizar Datos");
-
-                botonActualizar.onclick = function () {
-                    RegresarAEdicionElemento(divLista, divListaHtml);
-                }
-
-                let botonEliminar = crearButton("Eliminar");
-                botonEliminar.onclick = () => {
-                    eliminarDiv(divLista);
-                    eliminarDiv(divListaHtml);
-                }
-
-                let divListaHtml = document.createElement("div");
-                divListaHtml.classList.add("listasHtml");
-
-                divListaHtml.append(listaHtml, botonActualizar, botonEliminar);
-                divLista.before(divListaHtml);
-                */
             }
 
 
-            divLista.append(botonCrearLista,botonCancelar);
+            divLista.append(botonCrearLista, botonCancelar);
             opcionesMenu.before(divLista);
 
 
@@ -862,14 +832,36 @@
 
         function crearJson() {
 
+            let documentacion = {
+                "elementos": []
+            };
+
             let contenedor = document.getElementById("contenedor");
 
             let divs = contenedor.querySelectorAll("div:not(#opcionesMenu)");
 
             divs.forEach(div => {
                 console.log(div.dataset.informacion);
+                documentacion.elementos.push(JSON.parse(div.dataset.informacion));
+
             })
             console.log("dvis", divs);
+            console.log(documentacion);
+
+            let jsonString = JSON.stringify(documentacion, null, 2); // Convertir a string con formato
+            let blob = new Blob([jsonString], { type: 'application/json' }); // Crear un Blob
+            let url = URL.createObjectURL(blob); // Crear una URL para el Blob
+
+            let enlaceDescarga = document.createElement('a'); // Crear un enlace de descarga
+            enlaceDescarga.href = url;
+            enlaceDescarga.download = "nombreArchivo" + '.json'; // Nombre del archivo
+
+            document.body.appendChild(enlaceDescarga); // Agregar el enlace al DOM
+            enlaceDescarga.click(); // Simular un clic en el enlace
+
+            document.body.removeChild(enlaceDescarga); // Eliminar el enlace del DOM
+            URL.revokeObjectURL(url); // Liberar la URL del Blob
+
         }
 
 
