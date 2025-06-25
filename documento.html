@@ -183,19 +183,13 @@
 
         function crearFilaFormularioTabla(listaInputs) {
 
-
-            console.log(listaInputs);
-
             let tr = document.createElement("tr");
             for (let input of listaInputs) {
                 let td = document.createElement("td");
 
-                console.log("revisando el input", input.outerHTML);
-
                 let nuevoInput = input.cloneNode(true);
                 //nuevoInput.outerHTML = input.outerHTML;
                 nuevoInput.id = generarTextoAleatorio(longitud);
-                console.log("Este es el nuevo input", nuevoInput.outerHTML)
 
                 td.append(nuevoInput);
                 tr.append(td);
@@ -255,7 +249,6 @@
             if (etiqueta == "p" && palabrasImportantes.trim().trimStart().trimEnd() != "") {
                 let arregloPalabras = palabrasImportantes.split(",");
                 arregloPalabras.forEach(p => {
-                    console.log(p);
                     texto = texto.replaceAll(p, `<b>${p}</b>`);
                 });
             }
@@ -320,7 +313,6 @@
             let filas = tabla.querySelectorAll("tbody >tr");
             for (const fila of filas) {
                 let columnas = fila.querySelectorAll("td >input, td >select, td >textarea");
-                console.log(columnas);
 
                 let valores = [];
                 for (const columna of columnas) {
@@ -474,12 +466,13 @@
          * recibe como parametros un tipo de texto que quiera insertar
          * tambien el texto que voy a insertar, pero si el texto que voy a insertar es un parrafo, se activa un nuevo input donde puedo ingresar 
          * palabras que quiera remarcar, esto se separa por comas
+         * @param {object} informacion - objeto que se recibe al momento de cargar un proyecto, si recibe informacion, carga el texto tal cual fue almacenado y su modo de edicion.
         */
-        function agregarParrafo() {
+        function agregarParrafo(informacion = null) {
 
 
             let contenedor = document.getElementById("contenedor");
-            ultimo = document.querySelector("#opcionesMenu");
+            let opcionesMenu = document.querySelector("#opcionesMenu");
 
             //se crea div general que es el contenedor del elemento en general
             let divCrearParrafo = document.createElement("div");
@@ -535,12 +528,16 @@
                 divCrearParrafo.remove();
             }
 
-            divCrearParrafo.appendChild(divSelect);
-            divCrearParrafo.appendChild(divInput);
-            divCrearParrafo.appendChild(botonCrear);
-            divCrearParrafo.appendChild(botonCancelar);
+            divCrearParrafo.append(divSelect, divInput, botonCrear, botonCancelar);
+            opcionesMenu.before(divCrearParrafo);
 
-            contenedor.insertBefore(divCrearParrafo, ultimo);
+            if (informacion) {
+                selectTexto.value = informacion.etiqueta;
+                inputParrafo.value = informacion.texto;
+                inputPalabrasImportantes.value = informacion.palabrasImportantes;
+                crearTextoHtml(informacion.etiqueta, informacion.texto, informacion.palabrasImportantes, divCrearParrafo, contenedor);
+            }
+
 
         }
 
@@ -548,9 +545,10 @@
          * esta funcion es la encargada de crear un nuevo elemento de lista, puede ser ordenada o no ordenada
          * primero crea un formulario peque;o que se encargara de crear el html final
          * un select para el tipo de lista, luego una lista de inputs que seran dinamicos y en base a los mimos se generara el html
+         * @param {object} informacion - objeto que se recibe al momento de cargar un proyecto. si recibe informacion, carga todos los elementos de la lista correspondiente y su modo de edicion
          * 
          **/
-        function agregarLista() {
+        function agregarLista(informacion = null) {
 
             let tiposLista = [
                 { "value": "ul", "texto": "Lista no ordenada (UL)" },
@@ -607,6 +605,19 @@
             divLista.append(botonCrearLista, botonCancelar);
             opcionesMenu.before(divLista);
 
+            if (informacion) {
+
+                selectLista.value = informacion.tipoSelect;
+                informacion.valoresLi.forEach(li => {
+                    let { div: divInput, input: input } = crearInputText("input", "Ingresa la descripcion de la opcion de lista", "item", false, true);
+                    input.value = li;
+                    botonAgregarOpcion.before(divInput);
+                });
+
+                crearListaHtml(divLista, informacion.tipoSelect);
+
+            }
+
 
         }
 
@@ -615,7 +626,7 @@
          * primero se debe llenar una tabla de inputs y en base a esto se crea la tabla html que sera utilizada.
          * Esta tabla puede ser editada una vez que se finaliza y recupera todos los elementos en modo edicion nuevamente.
          **/
-        function agregarTablaVariables() {
+        function agregarTablaVariables(informacion = null) {
 
             let tiposVariables = [
                 { "value": "string", "texto": "string (cadena)" },
@@ -655,7 +666,7 @@
             ];
 
 
-            let inputs = [nombre, inputSelectVariable, inputSelectParametros, descripcion];
+            let listaInputs = [nombre, inputSelectVariable, inputSelectParametros, descripcion];
 
             let tabla = crearTablaHeader(headers);
 
@@ -666,7 +677,7 @@
 
             let botonAgregarFila = crearButton("Agregar Fila");
             botonAgregarFila.onclick = function () {
-                let tr = crearFilaFormularioTabla(inputs);
+                let tr = crearFilaFormularioTabla(listaInputs);
                 tbody.append(tr);
             }
 
@@ -684,11 +695,32 @@
             let opcionesMenu = document.getElementById("opcionesMenu");
             opcionesMenu.before(div);
 
+            if (informacion) {
+
+                informacion.detalleInformacion.forEach(info => {
+
+                    let tr = crearFilaFormularioTabla(listaInputs);
+                    tbody.append(tr);
+
+                    let inputs = tr.querySelectorAll("td >input, td >select, td >textarea");
+                    info.forEach((valor, indice) => {
+                        inputs[indice].value = valor;
+                    })
+
+                });
+                crearTablaHtml(headers, tabla, div, TIPOS.tablaVariables);
+
+            }
+
         }
 
 
-
-        function agregarTablaDinamica() {
+        /**
+         * funcion que se encarga de crear las columnas que tendra la tabla dinamica
+         * se crean inputs de manera dinamica, cada input representa una columna de la tabla a crear.
+         * invoca la funcion agregarTablaDinamicaInformacion
+        */
+        function agregarTablaDinamica(informacion = null) {
 
 
             let headers = [];
@@ -731,19 +763,30 @@
             let opcionesMenu = document.getElementById("opcionesMenu");
             opcionesMenu.before(div);
 
+            if (informacion) {
+                headers = informacion.headers;
+                headers.forEach(h => {
+                    let { div: divHeader, input: inputHeader } = crearInputText("input", "ingresa el nombre de la columna", "Nombre columna", false, true);
+                    inputHeader.value = h;
+                    divListado.append(divHeader);
+
+                });
+                agregarTablaDinamicaInformacion(div, headers, informacion);
+
+            }
+
         }
 
         /**
          * funcion que sirve para agregar el body de la tabla dinamica creada en la funcion agregarTablaDinamica
-         * @param {HtmlDivElement} div es el elemento html que contiene toda la informacion del header, se enviara para ser editada si es necesario
-         * @param {list[string]} headers es la lista de encabezados que tiene la tabla
+         * @param {HtmlDivElement} divFormularioEdicion - es el elemento html que contiene toda la informacion del header, se enviara para ser editada si es necesario
+         * @param {list[string]} headers - es la lista de encabezados que tiene la tabla
+         * @param {object} informacion - contiene la informacion de una tabla creada previamente, eso se utiliza unicamente si se esta cargando un proyecto, crea el html como tal y el formulario de edicion correspondiente
         */
-        function agregarTablaDinamicaInformacion(divFormularioEdicion, headers) {
+        function agregarTablaDinamicaInformacion(divFormularioEdicion, headers, informacion = null) {
 
-            console.log("llegue", divFormularioEdicion);
             let div = document.createElement("div");
             let tabla = crearTablaHeader(headers);
-            console.log(tabla);
 
             let listaInputs = [];
 
@@ -751,44 +794,57 @@
                 let { input: input } = crearInputText("input", "Ingresa la informacion");
                 listaInputs.push(input);
             }
-            //div.append(tabla);
 
             let tbody = document.createElement("tbody");
             tabla.append(tbody);
 
-            let buttonCancelar = document.createElement("button");
-            buttonCancelar.textContent = "Eliminar";
+            let buttonCancelar = crearButton("Eliminar");
 
             buttonCancelar.addEventListener("onclick", function () { eliminarDiv(div) });
             buttonCancelar.addEventListener("onclick", function () { eliminarDiv(divFormularioEdicion) });
 
-            let buttonAgregarFila = document.createElement("button");
-            buttonAgregarFila.textContent = "Agregar fila";
+            let buttonAgregarFila = crearButton("Agregar fila");
 
             buttonAgregarFila.onclick = function () {
                 let tr = crearFilaFormularioTabla(listaInputs);
                 tbody.append(tr);
             }
 
-            let buttonActualizarHeader = document.createElement("button");
-            buttonActualizarHeader.textContent = "Editar Encabezado";
+            let buttonActualizarHeader = crearButton("Editar Encabezado");
             buttonActualizarHeader.onclick = () => RegresarAEdicionElemento(divFormularioEdicion, div);
 
-            let buttonCrear = document.createElement("button");
-            buttonCrear.textContent = "crear tabla";
+            let buttonCrear = crearButton("Crear Tabla");
 
             buttonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica);
             div.append(tabla, buttonAgregarFila, buttonCrear, buttonActualizarHeader, buttonCancelar);
             divFormularioEdicion.before(div);
-            //let opcionesMenu = document.getElementById("opcionesMenu");
-            //opcionesMenu.before(div);
             divFormularioEdicion.remove();
+
+            if (informacion) {
+
+                informacion.detalleInformacion.forEach(info => {
+
+                    let tr = crearFilaFormularioTabla(listaInputs);
+                    tbody.append(tr);
+
+                    let inputs = tr.querySelectorAll("td >input, td >select, td >textarea");
+                    info.forEach((valor, indice) => {
+                        inputs[indice].value = valor;
+                    })
+
+                });
+                crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica);
+
+            }
 
 
         }
 
-
-        function agregarImagen() {
+        /**
+         * funcion que sirve para agregar una imagen dado una url
+         * @param {object} informacion - contiene la informacion de un json, eso se utiliza unicamente si se esta cargando un proyecto
+        */
+        function agregarImagen(informacion = null) {
 
 
             divFormularioEdicion = document.createElement("div");
@@ -807,9 +863,14 @@
             let opcionesMenu = document.getElementById("opcionesMenu");
             opcionesMenu.before(divFormularioEdicion);
 
+            if (informacion) {
+                inputImagen.value = informacion.src;
+                crearImagenHtml(divFormularioEdicion, informacion.src);
+            }
+
         }
 
-        function agregarCodigo() {
+        function agregarCodigo(informacion = null) {
 
             let divFormularioEdicion = document.createElement("div");
             let { div: divCodigo, input: inputCodigo } = crearInputText("textarea", "Ingresa el codigo a documentar", "Codigo");
@@ -828,6 +889,11 @@
             let opcionesMenu = document.getElementById("opcionesMenu")
             opcionesMenu.before(divFormularioEdicion);
 
+            if (informacion) {
+                inputCodigo = informacion.codigo;
+                crearCodigoHtml(divFormularioEdicion, informacion.codigo);
+            }
+
         }
 
         function crearJson() {
@@ -841,20 +907,22 @@
             let divs = contenedor.querySelectorAll("div:not(#opcionesMenu)");
 
             divs.forEach(div => {
-                console.log(div.dataset.informacion);
                 documentacion.elementos.push(JSON.parse(div.dataset.informacion));
-
             })
-            console.log("dvis", divs);
-            console.log(documentacion);
 
-            let jsonString = JSON.stringify(documentacion, null, 2); // Convertir a string con formato
+            descargaJson(documentacion, "archivo");
+
+        }
+
+        function descargaJson(json, nombreArchivo) {
+
+            let jsonString = JSON.stringify(json, null, 2); // Convertir a string con formato
             let blob = new Blob([jsonString], { type: 'application/json' }); // Crear un Blob
             let url = URL.createObjectURL(blob); // Crear una URL para el Blob
 
             let enlaceDescarga = document.createElement('a'); // Crear un enlace de descarga
             enlaceDescarga.href = url;
-            enlaceDescarga.download = "nombreArchivo" + '.json'; // Nombre del archivo
+            enlaceDescarga.download = nombreArchivo + '.json'; // Nombre del archivo
 
             document.body.appendChild(enlaceDescarga); // Agregar el enlace al DOM
             enlaceDescarga.click(); // Simular un clic en el enlace
@@ -862,6 +930,123 @@
             document.body.removeChild(enlaceDescarga); // Eliminar el enlace del DOM
             URL.revokeObjectURL(url); // Liberar la URL del Blob
 
+        }
+
+        function recuperarDocumentacion(json) {
+
+
+            json.elementos.forEach(informacion => {
+
+                switch (informacion.tipoCreacion) {
+                    case TIPOS.texto:
+                        agregarParrafo(informacion);
+                        break;
+                    case TIPOS.lista:
+                        agregarLista(informacion);
+                        break;
+                    case TIPOS.tablaVariables:
+                        agregarTablaVariables(informacion);
+                        break;
+                    case TIPOS.tablaDinamica:
+                        agregarTablaDinamica(informacion);
+                        break;
+                    case TIPOS.imagen:
+                        agregarImagen(informacion);
+                        break;
+                    case TIPOS.codigo:
+                        console.log("codigo");
+                        break;
+                }
+
+            });
+        }
+
+        window.onload = function () {
+            let documentacion = {
+                "elementos": [
+                    {
+                        "tipoCreacion": "texto",
+                        "etiqueta": "h1",
+                        "texto": "Satoru Gojo",
+                        "palabrasImportantes": ""
+                    },
+                    {
+                        "tipoCreacion": "texto",
+                        "etiqueta": "p",
+                        "texto": "Satoru Gojo (五条悟 Gojō Satoru?) es uno de los personajes de la serie manga Tokyo Metropolitan Curse Technical School y uno de los protagonistas de la serie secuela, Jujutsu Kaisen. Conocido con el apodo de El Chamán Más Fuerte (最強の呪術師 Saikyō no Jujutsu-shi?), es uno de los cuatro chamanes de Clase Especial, antiguo compañero de Suguru Geto y Shoko Ieiri, y actual profesor del Colegio Técnico de Magia Metropolitana de Tokio, encargado de los alumnos de primer año.",
+                        "palabrasImportantes": "Satoru Gojo,Jujutsu Kaisen"
+                    },
+                    {
+                        "tipoCreacion": "texto",
+                        "etiqueta": "p",
+                        "texto": "Como único miembro y cabeza del Clan Gojo, es descendiente del chamán y espíritu vengativo, Sugawara-no-Michizan[3], y heredero de la Técnica de Maldición Ilimitada y el poder de los seis ojos. Desde el día de su nacimiento, se produjo un balance de poder entre la humanidad y las maldiciones; la caída de su clan y por ende, su muerte, significaría perder dicho balance, provocando una guerra a gran escala que sería difícil de ganar para la humanidad[4].",
+                        "palabrasImportantes": ""
+                    },
+                    {
+                        "tipoCreacion": "imagen",
+                        "src": "https://m.media-amazon.com/images/I/81KJQq1b7fL._AC_SY879_.jpg"
+                    },
+                    {
+                        "tipoCreacion": "lista",
+                        "tipoSelect": "ul",
+                        "valoresLi": [
+                            "dfgsf",
+                            "sdfgsdf",
+                            "sdfgsf"
+                        ]
+                    },
+                    {
+                        "tipoCreacion": "tablaDinamica",
+                        "headers": [
+                            "a",
+                            "b",
+                            "c"
+                        ],
+                        "detalleInformacion": [
+                            [
+                                "dddd",
+                                "eeee",
+                                "ffff"
+                            ],
+                            [
+                                "hhh",
+                                "hhh",
+                                "iii"
+                            ]
+                        ]
+                    },
+                    {
+                        "tipoCreacion": "tablaVariables",
+                        "headers": [
+                            "Nombre",
+                            "Tipo",
+                            "Flujo",
+                            "Descripción"
+                        ],
+                        "detalleInformacion": [
+                            [
+                                "ssdfsd",
+                                "string",
+                                "global",
+                                "adfasdf"
+                            ],
+                            [
+                                "xvxczx",
+                                "object",
+                                "entorno",
+                                "zcvzcxv"
+                            ],
+                            [
+                                "werweer",
+                                "double",
+                                "entrada",
+                                "rrrrrrrrrrrrrrrrrr"
+                            ]
+                        ]
+                    }
+                ]
+            }
+            recuperarDocumentacion(documentacion);
         }
 
 
