@@ -246,6 +246,8 @@
             parrafo.className = "parrafo";
             //let texto = /*inputParrafo.value*/ texto;
 
+            //parrafo.popover = "vamos a hacer una prueba del popover"
+
             if (etiqueta == "p" && palabrasImportantes.trim().trimStart().trimEnd() != "") {
                 let arregloPalabras = palabrasImportantes.split(",");
                 arregloPalabras.forEach(p => {
@@ -257,22 +259,27 @@
 
             div.setAttribute("data-informacion", JSON.stringify(informacion));
 
-            let botonEliminar = document.createElement("button");
-            botonEliminar.textContent = "eliminar";
-
+            let botonEliminar = crearButton("Eliminar");
             botonEliminar.onclick = () => eliminarDiv(div);
 
-            let botonActualizar = document.createElement("button");
-            botonActualizar.textContent = "Actualizar Texto";
+            let botonActualizar = crearButton("Actualizar Texto");
             botonActualizar.onclick = () => RegresarAEdicionElemento(divCrearParrafo, div);
 
 
-            div.appendChild(parrafo);
-            div.appendChild(botonActualizar);
-            div.appendChild(botonEliminar);
+            div.onmouseenter = function () {
+                div.append( botonActualizar, botonEliminar);
+            }
 
-            contenedor.insertBefore(div, divCrearParrafo);
+            div.onmouseleave = function(){
+                botonActualizar.remove();
+                botonEliminar.remove();
+            }
+            div.append(parrafo);
+ 
+            divCrearParrafo.before(div);
             divCrearParrafo.remove();
+
+
         }
 
 
