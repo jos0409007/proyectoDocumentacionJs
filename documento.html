@@ -34,6 +34,11 @@
 
         let longitud = 12;
 
+        let atributo = {
+            "atributo":"",
+            "valor":""
+        }
+
         let TIPOS = {
             "texto": "texto",
             "lista": "lista",
@@ -101,20 +106,23 @@
         /**
          * funcion que crea un boton.
          * @param {string} textContent, descripcion que aparecera en el boton creado
+         * @param {list[string]} clases - son la lista de clases que se le agregaran al boton, por defecto esta vacio
+         * @param {list[object]} atributos - lista de atributos a agregar al boton, por defecto esta vacio, tomar como base el objeto global atributo
          *
         */
-        function crearButton(textContent, clase = "") {
+        function crearButton(textContent, clases = [], atributos = []) {
             let button = document.createElement("button");
             button.textContent = textContent;
 
-            if (clase !== "") button.classList.add(clase);
+            clases.forEach(clase => button.classList.add(clase));
+            atributos.forEach(atributo => button.setAttribute(atributo.atributo,atributo.valor));
 
             return button
         }
+
         /**
          * recibe como parametro una lista|arreglo de objetos {"value":str, "texto":str}
         */
-
         function crearInputSelect(opciones, descripcionLabel) {
 
             let id = generarTextoAleatorio(longitud);
@@ -181,12 +189,17 @@
 
         }
 
+
+        /**
+         * funcion que sirve para crear una fila de tabla con inputs, esto es para una tabla en formato edicion.
+         * @param {list[HtmlInputElement | HtmlSelectElement | HtmlTextAreaElement]} listaInputs - es una lista con diferentes tipos de inputs, crea una copia del elemento, le agrega un nuevo id y lo agrega a una columna
+        */
         function crearFilaFormularioTabla(listaInputs) {
 
             let tr = document.createElement("tr");
             for (let input of listaInputs) {
-                let td = document.createElement("td");
 
+                let td = document.createElement("td");
                 let nuevoInput = input.cloneNode(true);
                 //nuevoInput.outerHTML = input.outerHTML;
                 nuevoInput.id = generarTextoAleatorio(longitud);
@@ -212,6 +225,64 @@
             }
 
             return tr;
+        }
+
+
+
+        /**
+         * funcion para crear los botones de edicion de las funciones que necesitan retornar a un estado anterior
+         * @param {HtmlDivElement} divFormularioEdicion - es el div donde se tiene la informacion en formato edicion del html
+         * @param {HtmlDivElement} divHtml - es el formulario actual 
+        */
+        function botonesEdicionHtml(divFormularioEdicion, divActual) {
+
+            let buttonActualizar = document.createElement("button");
+            buttonActualizar.textContent = "Actualizar";
+            buttonActualizar.onclick = () => RegresarAEdicionElemento(divFormularioEdicion, divActual);
+
+            let buttonEliminar = document.createElement("button");
+            buttonEliminar.textContent = "Eliminar";
+            buttonEliminar.onclick = () => {
+                eliminarDiv(divFormularioEdicion);
+                eliminarDiv(divActual);
+
+            }
+
+            let buttonPosicion = crearButton("Mover Posicion");
+            buttonPosicion.addEventListener("click", function(){
+                console.log(this);
+                let contenedor = document.getElementById("contenedor");
+                let divs = contenedor.querySelectorAll("div:not(#opcionesMenu)");
+                let ol = document.createElement("ol")
+                divs.forEach((dv) => {
+
+                    let li = document.createElement("li");
+                    let id = dv.id
+                    li.textContent = dv.id;
+                    
+                    console.log(li);
+                    let buttonMover = crearButton("mover aqui")
+                    buttonMover.onclick = function(){
+                        let div = document.getElementById(id);
+
+                        if (div == divActual.nextElementSibling)
+                            div.after(divActual);
+                        else
+                            div.before(divActual);
+
+                        ol.remove();
+                    }
+                    if (dv !== divActual) li.append(buttonMover);
+                    ol.append(li);
+                })
+                console.log(divs);
+                divActual.append(ol);
+            });
+
+            divActual.append(buttonActualizar, buttonEliminar, buttonPosicion);
+
+            //return {buttonActualizar:buttonActualizar, buttonEliminar:buttonEliminar};
+
         }
 
         /**
@@ -259,23 +330,22 @@
 
             div.setAttribute("data-informacion", JSON.stringify(informacion));
 
-            let botonEliminar = crearButton("Eliminar");
-            botonEliminar.onclick = () => eliminarDiv(div);
-
-            let botonActualizar = crearButton("Actualizar Texto");
-            botonActualizar.onclick = () => RegresarAEdicionElemento(divCrearParrafo, div);
+            div.append(parrafo);
 
 
+            botonesEdicionHtml(divCrearParrafo, div);
+
+            /*
             div.onmouseenter = function () {
-                div.append( botonActualizar, botonEliminar);
+                div.append( buttonActualizar, buttonEliminar);
             }
 
             div.onmouseleave = function(){
-                botonActualizar.remove();
-                botonEliminar.remove();
+                buttonActualizar.remove();
+                buttonEliminar.remove();
             }
-            div.append(parrafo);
- 
+                */
+
             divCrearParrafo.before(div);
             divCrearParrafo.remove();
 
@@ -283,13 +353,33 @@
         }
 
 
-
         function eliminarDiv(div) {
             div.remove();
         }
 
 
-        function RegresarAEdicionElemento(divActualizar, div) {
+        function RegresarAEdicionElemento(divActualizar, div, agregarBtnCancelar = true) {
+
+            if (agregarBtnCancelar) {
+
+                let busqueda = divActualizar.querySelector('button[data-tipo="cancelar"]');
+                if (!busqueda) {
+                    let button = divActualizar.querySelector('button[data-tipo="eliminar"]');
+
+                    let buttonCancelar = crearButton("Cancelar Cambios");
+                    buttonCancelar.setAttribute("data-tipo", "cancelar");
+
+                    buttonCancelar.onclick = function () {
+                        RegresarAEdicionElemento(div, divActualizar, false);
+                    }
+                    button.before(buttonCancelar);
+                }
+                else{
+                    busqueda.onclick = () => RegresarAEdicionElemento(div, divActualizar, false);
+                }
+
+            }
+
             div.before(divActualizar);
             eliminarDiv(div)
 
@@ -302,13 +392,17 @@
          * @param {HtmlDivElement} div, es el div que contiene la tabla de edicion
          * @param {string} tipoTabla - recibe el tipo de tabla que se esta creando (tablaVariables, tablaDinamica)
         */
-        function crearTablaHtml(headers, tabla, div, tipoTabla) {
+        function crearTablaHtml(headers, tabla, div, tipoTabla, tituloTabla = "") {
 
             let informacion = {
                 "tipoCreacion": tipoTabla,
                 "headers": headers,
                 "detalleInformacion": []
             }
+
+            let titulo = document.createElement("h4");
+            if (tituloTabla && tituloTabla != "") titulo.textContent = tituloTabla;
+
 
             let divTablaHtml = document.createElement("div");
             divTablaHtml.id = generarTextoAleatorio(longitud);
@@ -333,18 +427,13 @@
             }
             tablaHtml.append(tbodyHtml);
 
+            divTablaHtml.append(titulo);
             divTablaHtml.append(tablaHtml);
             divTablaHtml.setAttribute("data-informacion", JSON.stringify(informacion));
 
-            let buttonActualizar = document.createElement("button");
-            buttonActualizar.textContent = "Actualizar";
-            buttonActualizar.onclick = () => RegresarAEdicionElemento(div, divTablaHtml);
+            botonesEdicionHtml(div, divTablaHtml);
 
-            let buttonEliminar = document.createElement("button");
-            buttonEliminar.textContent = "Eliminar";
-            buttonEliminar.onclick = () => eliminarDiv(divTablaHtml);
-
-            divTablaHtml.append(buttonActualizar, buttonEliminar);
+            //divTablaHtml.append(buttonActualizar, buttonEliminar);
 
             div.before(divTablaHtml);
             div.remove();
@@ -373,13 +462,10 @@
             imagen.src = src;
             imagen.id = generarTextoAleatorio(longitud);
 
-            let buttonEliminar = crearButton("Eliminar");
-            buttonEliminar.onclick = () => eliminarDiv(div);
+            div.append(imagen);
+            botonesEdicionHtml(divFormularioEdicion, div);
 
-            let buttonActualizar = crearButton("Actualizar");
-            buttonActualizar.onclick = () => RegresarAEdicionElemento(divFormularioEdicion, div);
 
-            div.append(imagen, buttonActualizar, buttonEliminar);
             divFormularioEdicion.before(div);
             divFormularioEdicion.remove();
         }
@@ -410,29 +496,32 @@
             let code = document.createElement("code");
             code.textContent = codigo;
             pre.append(code);
+            div.append(pre);
 
-            let buttonActualiar = crearButton("Actualiar");
-            buttonActualiar.onclick = () => RegresarAEdicionElemento(divFormularioEdicion, div);
-            let buttonEliminar = crearButton("Eliminar");
-            buttonEliminar.onclick = () => {
-                eliminarDiv(divFormularioEdicion);
-                eliminarDiv(div)
-            }
+            botonesEdicionHtml(divFormularioEdicion, div);
 
-            div.append(pre, buttonActualiar, buttonEliminar);
             divFormularioEdicion.before(div);
             divFormularioEdicion.remove();
         }
 
-        function crearListaHtml(divFormularioEdicion, tipoLista) {
+        function crearListaHtml(divFormularioEdicion, tipoLista, tituloLista = "") {
 
             let listaHtml = document.createElement(tipoLista);
 
             let informacion = {
                 "tipoCreacion": TIPOS.lista,
                 "tipoSelect": tipoLista,
+                "tituloLista": tituloLista,
                 "valoresLi": []
             }
+
+            let titulo = document.createElement("h4");
+            if (tituloLista && tituloLista != "") {
+
+                titulo.textContent = tituloLista;
+            }
+
+
 
             let inputs = divFormularioEdicion.querySelectorAll("div.miLista >div>input");
             inputs.forEach(element => {
@@ -443,23 +532,15 @@
             });
 
 
-            let botonActualizar = crearButton("Actualizar Datos");
-
-            botonActualizar.onclick = function () {
-                RegresarAEdicionElemento(divFormularioEdicion, divListaHtml);
-            }
-
-            let botonEliminar = crearButton("Eliminar");
-            botonEliminar.onclick = () => {
-                eliminarDiv(divFormularioEdicion);
-                eliminarDiv(divListaHtml);
-            }
-
             let divListaHtml = document.createElement("div");
             divListaHtml.classList.add("listasHtml");
 
-            divListaHtml.append(listaHtml, botonActualizar, botonEliminar);
+
             divListaHtml.setAttribute("data-informacion", JSON.stringify(informacion));
+            divListaHtml.append(titulo, listaHtml);
+
+            botonesEdicionHtml(divFormularioEdicion, divListaHtml);
+
 
             divFormularioEdicion.before(divListaHtml);
             divFormularioEdicion.remove();
@@ -515,8 +596,8 @@
 
 
             //se agrega boton crear
-            let botonCrear = document.createElement("button");
-            botonCrear.textContent = "Crear Texto";
+
+            let botonCrear = crearButton("Aceptar");
 
             //se agrega la funcion que va a generar el HTML del texto y sus funcionalidades para regresar al modo de edicion
             botonCrear.onclick = function () {
@@ -528,8 +609,8 @@
                     contenedor = contenedor);
             }
 
-            let botonCancelar = document.createElement("button");
-            botonCancelar.textContent = "Cancelar";
+            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
+            let botonCancelar = crearButton("Eliminar",[], [atributoEliminar]);
 
             botonCancelar.onclick = function () {
                 divCrearParrafo.remove();
@@ -573,8 +654,10 @@
             //primero que todo, creo un select el cual tiene el tipo de lista que voy a usar
 
             let { div: divSelectLista, select: selectLista } = crearInputSelect(tiposLista, "Selecciona la lista");
+            let { div: divTituloLista, input: inputTitulo } = crearInputText("input", "ingresa el titulo", "titulo lista");
 
             divLista.appendChild(divSelectLista);
+            divLista.append(divTituloLista);
 
             //creo un nuevo div, este es para guardar todos los input que se van a crear de manera dinamica para todas los li de la lista
             let divElementosLista = document.createElement("div");
@@ -596,7 +679,9 @@
             divLista.appendChild(divElementosLista);
 
             //se crea el boton para cancelar todo el elemento de lista que estoy creando;
-            let botonCancelar = crearButton("Cancelar creacion de lista");
+            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
+
+            let botonCancelar = crearButton("Eliminar",[],[atributoEliminar]);
             botonCancelar.onclick = function () {
                 divLista.remove();
             }
@@ -605,7 +690,7 @@
             let botonCrearLista = crearButton("Crear Lista");
             botonCrearLista.onclick = function () {
 
-                crearListaHtml(divLista, selectLista.value);
+                crearListaHtml(divLista, selectLista.value, inputTitulo.value);
             }
 
 
@@ -615,6 +700,8 @@
             if (informacion) {
 
                 selectLista.value = informacion.tipoSelect;
+                inputTitulo.value = informacion.titulo ?? "";
+
                 informacion.valoresLi.forEach(li => {
                     let { div: divInput, input: input } = crearInputText("input", "Ingresa la descripcion de la opcion de lista", "item", false, true);
                     input.value = li;
@@ -662,6 +749,8 @@
             let { input: nombre } = crearInputText("input", "ingresa el nombre", "");
             let { input: descripcion } = crearInputText("textarea", "ingresa la descripcion de la variable", "");
 
+            let { div: divTituloTabla, input: inputTitulo } = crearInputText("input", "Ingresa el titulo (opcional)", "Titulo Tabla");
+
             let div = document.createElement("div");
             div.classList.add("tablas");
 
@@ -679,7 +768,6 @@
 
             let tbody = document.createElement("tbody");
 
-            div.append(tabla);
             tabla.append(tbody);
 
             let botonAgregarFila = crearButton("Agregar Fila");
@@ -689,11 +777,14 @@
             }
 
             let botonCrear = crearButton("Crear tabla");
-            botonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaVariables);
+            botonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaVariables, inputTitulo.value);
 
-            let buttonCancelar = crearButton("Cancelar");
+            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
+            let buttonCancelar = crearButton("Cancelar",[],[atributoEliminar]);
+
             buttonCancelar.onclick = () => eliminarDiv(div);
 
+            div.append(divTituloTabla);
             div.append(tabla);
             div.append(botonAgregarFila);
             div.append(botonCrear);
@@ -737,7 +828,9 @@
 
             let buttonAgregar = crearButton("Agregar nombre columna");
             let buttonAceptar = crearButton("Aceptar");
-            let buttonCancelar = crearButton("Cancelar");
+
+            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
+            let buttonCancelar = crearButton("Cancelar",[],[atributoEliminar]);
 
 
             let divListado = document.createElement("div");
@@ -802,10 +895,15 @@
                 listaInputs.push(input);
             }
 
+            let { div: divTituloTabla, input: inputTitulo } = crearInputText("input", "Ingresa el titulo (opcional)", "Titulo Tabla");
+
+
             let tbody = document.createElement("tbody");
             tabla.append(tbody);
 
-            let buttonCancelar = crearButton("Eliminar");
+
+            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
+            let buttonCancelar = crearButton("Eliminar",[],[atributoEliminar]);
 
             buttonCancelar.addEventListener("onclick", function () { eliminarDiv(div) });
             buttonCancelar.addEventListener("onclick", function () { eliminarDiv(divFormularioEdicion) });
@@ -822,12 +920,14 @@
 
             let buttonCrear = crearButton("Crear Tabla");
 
-            buttonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica);
-            div.append(tabla, buttonAgregarFila, buttonCrear, buttonActualizarHeader, buttonCancelar);
+            buttonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica, inputTitulo.value);
+            div.append(divTituloTabla, tabla, buttonAgregarFila, buttonCrear, buttonActualizarHeader, buttonCancelar);
             divFormularioEdicion.before(div);
             divFormularioEdicion.remove();
 
             if (informacion) {
+
+                inputTitulo.value = informacion.titulo ?? "";
 
                 informacion.detalleInformacion.forEach(info => {
 
@@ -840,7 +940,7 @@
                     })
 
                 });
-                crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica);
+                crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica, inputTitulo.value);
 
             }
 
@@ -856,7 +956,9 @@
 
             divFormularioEdicion = document.createElement("div");
             let buttonCrear = crearButton("Crear Imagen");
-            let buttonCancelar = crearButton("Cancelar");
+
+            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
+            let buttonCancelar = crearButton("Cancelar",[],[atributoEliminar]);
             let { div: divInputImagen, input: inputImagen } = crearInputText("input", "Ingresa la url de la imagen", "url imagen");
 
             buttonCrear.onclick = function () {
@@ -883,7 +985,9 @@
             let { div: divCodigo, input: inputCodigo } = crearInputText("textarea", "Ingresa el codigo a documentar", "Codigo");
 
             let buttonCrear = crearButton("Agregar Código");
-            let buttonCancelar = crearButton("Cancelar");
+            
+            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
+            let buttonCancelar = crearButton("Cancelar",[],[atributoEliminar]);
             buttonCancelar.onclick = () => eliminarDiv(divFormularioEdicion);
 
             buttonCrear.onclick = function () {
