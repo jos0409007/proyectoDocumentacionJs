@@ -35,8 +35,8 @@
         let longitud = 12;
 
         let atributo = {
-            "atributo":"",
-            "valor":""
+            "atributo": "",
+            "valor": ""
         }
 
         let TIPOS = {
@@ -104,6 +104,25 @@
         }
 
         /**
+         * funcion para crear un div, al que le enviare una lista de clases y una lista de atributos segun sea necesario
+         * @param {list[string]} clases - una lista de strings, cada string representa una clase a agregar
+         * @param {list[object]} atributos - lista de objetos con claves {atributo, valor}, deben ser extendidos del objeto atributo
+        */
+        function crearDiv(clases = [], atributos = []) {
+
+            let div = document.createElement("div");
+            div.id = generarTextoAleatorio(longitud);
+
+            if (clases.length > 0) div.classList.add(clases);
+
+            atributos.forEach(a => {
+                div.setAttribute(a.atributo, a.valor);
+            });
+
+            return div;
+        }
+
+        /**
          * funcion que crea un boton.
          * @param {string} textContent, descripcion que aparecera en el boton creado
          * @param {list[string]} clases - son la lista de clases que se le agregaran al boton, por defecto esta vacio
@@ -115,7 +134,7 @@
             button.textContent = textContent;
 
             clases.forEach(clase => button.classList.add(clase));
-            atributos.forEach(atributo => button.setAttribute(atributo.atributo,atributo.valor));
+            atributos.forEach(atributo => button.setAttribute(atributo.atributo, atributo.valor));
 
             return button
         }
@@ -228,6 +247,44 @@
         }
 
 
+        /**
+         * funcion para editar las posiciones de los divs que se han editado actualmente
+         * @param {HtmlDivElement} divActual - representa el div que ha hecho click en el boton de editar posicion
+        */
+        function editarPosiciones(divActual) {
+
+            let contenedor = document.getElementById("contenedor");
+            let divs = contenedor.querySelectorAll("div:not(#opcionesMenu)");
+
+            let divEdicion = crearDiv();
+            let ol = document.createElement("ol")
+            divs.forEach((dv) => {
+
+                let li = document.createElement("li");
+                let id = dv.id
+                li.textContent = dv.id;
+
+
+                let buttonMover = crearButton("mover aqui")
+                buttonMover.onclick = function () {
+                    let div = document.getElementById(id);
+
+                    if (div == divActual.nextElementSibling)
+                        div.after(divActual);
+                    else
+                        div.before(divActual);
+
+                    divEdicion.remove();
+                }
+                if (dv !== divActual) li.append(buttonMover);
+                ol.append(li);
+            });
+            let buttonCancelar = crearButton("Cancelar");
+            buttonCancelar.onclick = () => eliminarDiv(divEdicion);
+
+            divEdicion.append(ol, buttonCancelar);
+            divActual.append(divEdicion);
+        }
 
         /**
          * funcion para crear los botones de edicion de las funciones que necesitan retornar a un estado anterior
@@ -249,39 +306,13 @@
             }
 
             let buttonPosicion = crearButton("Mover Posicion");
-            buttonPosicion.addEventListener("click", function(){
-                console.log(this);
-                let contenedor = document.getElementById("contenedor");
-                let divs = contenedor.querySelectorAll("div:not(#opcionesMenu)");
-                let ol = document.createElement("ol")
-                divs.forEach((dv) => {
+            buttonPosicion.addEventListener("click", function () {
 
-                    let li = document.createElement("li");
-                    let id = dv.id
-                    li.textContent = dv.id;
-                    
-                    console.log(li);
-                    let buttonMover = crearButton("mover aqui")
-                    buttonMover.onclick = function(){
-                        let div = document.getElementById(id);
+                editarPosiciones(divActual);
 
-                        if (div == divActual.nextElementSibling)
-                            div.after(divActual);
-                        else
-                            div.before(divActual);
-
-                        ol.remove();
-                    }
-                    if (dv !== divActual) li.append(buttonMover);
-                    ol.append(li);
-                })
-                console.log(divs);
-                divActual.append(ol);
             });
 
             divActual.append(buttonActualizar, buttonEliminar, buttonPosicion);
-
-            //return {buttonActualizar:buttonActualizar, buttonEliminar:buttonEliminar};
 
         }
 
@@ -304,17 +335,18 @@
                 "palabrasImportantes": palabrasImportantes
             }
 
+            let atributoInformacion = { ...atributo, "atributo": "data-informacion", "valor": JSON.stringify(informacion) };
+            let atributoNombre = {...atributo, "atributo":"data-nombre", "valor":`texto-${informacion.etiqueta}`};
+            let atributos = [];
+            atributos.push(atributoInformacion);
+            atributos.push(atributoNombre);
 
-            let parrafosExistentes = document.querySelectorAll(".miClase").length;
-
-            let div = document.createElement("div");
-            div.className = "miClase";
-            div.id = `divParrafo${parrafosExistentes + 1}`;
-
+            let div = crearDiv([], atributos);
 
             let parrafo = document.createElement(etiqueta);
             parrafo.id = generarTextoAleatorio(longitud);
             parrafo.className = "parrafo";
+
             //let texto = /*inputParrafo.value*/ texto;
 
             //parrafo.popover = "vamos a hacer una prueba del popover"
@@ -327,24 +359,9 @@
             }
             parrafo.innerHTML = texto;
 
-
-            div.setAttribute("data-informacion", JSON.stringify(informacion));
-
             div.append(parrafo);
 
-
             botonesEdicionHtml(divCrearParrafo, div);
-
-            /*
-            div.onmouseenter = function () {
-                div.append( buttonActualizar, buttonEliminar);
-            }
-
-            div.onmouseleave = function(){
-                buttonActualizar.remove();
-                buttonEliminar.remove();
-            }
-                */
 
             divCrearParrafo.before(div);
             divCrearParrafo.remove();
@@ -374,7 +391,7 @@
                     }
                     button.before(buttonCancelar);
                 }
-                else{
+                else {
                     busqueda.onclick = () => RegresarAEdicionElemento(div, divActualizar, false);
                 }
 
@@ -389,10 +406,10 @@
          * funcion que crea el html final de la tabla
          * @param {list[string]} headers, es la lista de los headers que tendra la tabla
          * @param {HtmlTableElement} tabla, es la tabla que contiene toda la informacion a crear, esta es una tabla en modo de edicion
-         * @param {HtmlDivElement} div, es el div que contiene la tabla de edicion
+         * @param {HtmlDivElement} divFormularioEdicion, es el div que contiene la tabla de edicion
          * @param {string} tipoTabla - recibe el tipo de tabla que se esta creando (tablaVariables, tablaDinamica)
         */
-        function crearTablaHtml(headers, tabla, div, tipoTabla, tituloTabla = "") {
+        function crearTablaHtml(headers, tabla, divFormularioEdicion, tipoTabla, tituloTabla = "") {
 
             let informacion = {
                 "tipoCreacion": tipoTabla,
@@ -400,12 +417,9 @@
                 "detalleInformacion": []
             }
 
-            let titulo = document.createElement("h4");
+            let titulo = document.createElement("h3");
             if (tituloTabla && tituloTabla != "") titulo.textContent = tituloTabla;
 
-
-            let divTablaHtml = document.createElement("div");
-            divTablaHtml.id = generarTextoAleatorio(longitud);
 
             let tablaHtml = crearTablaHeader(headers);
 
@@ -427,16 +441,21 @@
             }
             tablaHtml.append(tbodyHtml);
 
-            divTablaHtml.append(titulo);
-            divTablaHtml.append(tablaHtml);
-            divTablaHtml.setAttribute("data-informacion", JSON.stringify(informacion));
+            let atributoInformacion = { ...atributo };
+            atributoInformacion.atributo = "data-informacion";
+            atributoInformacion.valor = JSON.stringify(informacion);
 
-            botonesEdicionHtml(div, divTablaHtml);
+            let atributoNombre = {...atributo};
+            atributoNombre.atributo = "data-nombre";
+            atributoNombre.valor = "tabla";
 
-            //divTablaHtml.append(buttonActualizar, buttonEliminar);
+            let divTablaHtml = crearDiv([], [atributoInformacion, atributoNombre]);
+            divTablaHtml.append(titulo, tablaHtml);
 
-            div.before(divTablaHtml);
-            div.remove();
+            botonesEdicionHtml(divFormularioEdicion, divTablaHtml);
+
+            divFormularioEdicion.before(divTablaHtml);
+            divFormularioEdicion.remove();
 
         }
 
@@ -446,25 +465,41 @@
          * @param {string} src - es el source o direccion http de donde se encuentra la imagen a mostrar 
         */
 
-        function crearImagenHtml(divFormularioEdicion, src) {
+        function crearImagenHtml(divFormularioEdicion, src, alt) {
 
             let informacion = {
                 "tipoCreacion": TIPOS.imagen,
-                "src": src
+                "src": src,
+                "alt": alt ?? ""
             }
 
-            let div = document.createElement("div");
-            div.id = generarTextoAleatorio(longitud);
+            let atributoInformacion = { ...atributo };
+            atributoInformacion.atributo = "data-informacion";
+            atributoInformacion.valor = JSON.stringify(informacion);
 
-            div.setAttribute("data-informacion", JSON.stringify(informacion));
+            let atributoNombre = { ...atributo };
+            atributoNombre.atributo = "data-nombre";
+            atributoNombre.valor = "imagen"
+
+            let atributos = [atributoInformacion, atributoNombre];
+
+            console.log(atributos);
+            let div = crearDiv([], atributos)
 
             let imagen = document.createElement("img");
             imagen.src = src;
             imagen.id = generarTextoAleatorio(longitud);
+            imagen.alt = alt
+            imagen.loading = "lazy";
 
-            div.append(imagen);
+            let figure = document.createElement("figure");
+            let figcaption = document.createElement("figcaption");
+            figcaption.textContent = alt;
+
+            figure.append(imagen, figcaption);
+
+            div.append(figure);
             botonesEdicionHtml(divFormularioEdicion, div);
-
 
             divFormularioEdicion.before(div);
             divFormularioEdicion.remove();
@@ -486,12 +521,12 @@
                 "codigo": codigo
             }
 
-            let div = document.createElement("div");
+            let div = crearDiv();
             let pre = document.createElement("pre");
             pre.id = generarTextoAleatorio(longitud);
 
             div.setAttribute("data-informacion", JSON.stringify(informacion));
-
+            div.setAttribute("data-nombre","codigo");
 
             let code = document.createElement("code");
             code.textContent = codigo;
@@ -515,12 +550,11 @@
                 "valoresLi": []
             }
 
-            let titulo = document.createElement("h4");
+            let titulo = document.createElement("h3");
             if (tituloLista && tituloLista != "") {
 
                 titulo.textContent = tituloLista;
             }
-
 
 
             let inputs = divFormularioEdicion.querySelectorAll("div.miLista >div>input");
@@ -532,15 +566,13 @@
             });
 
 
-            let divListaHtml = document.createElement("div");
-            divListaHtml.classList.add("listasHtml");
-
+            let divListaHtml = crearDiv(["listasHtml"]);
 
             divListaHtml.setAttribute("data-informacion", JSON.stringify(informacion));
+            divListaHtml.setAttribute("data-nombre", `lista-${tipoLista}`);
             divListaHtml.append(titulo, listaHtml);
 
             botonesEdicionHtml(divFormularioEdicion, divListaHtml);
-
 
             divFormularioEdicion.before(divListaHtml);
             divFormularioEdicion.remove();
@@ -609,8 +641,8 @@
                     contenedor = contenedor);
             }
 
-            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
-            let botonCancelar = crearButton("Eliminar",[], [atributoEliminar]);
+            let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
+            let botonCancelar = crearButton("Eliminar", [], [atributoEliminar]);
 
             botonCancelar.onclick = function () {
                 divCrearParrafo.remove();
@@ -679,9 +711,9 @@
             divLista.appendChild(divElementosLista);
 
             //se crea el boton para cancelar todo el elemento de lista que estoy creando;
-            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
+            let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
 
-            let botonCancelar = crearButton("Eliminar",[],[atributoEliminar]);
+            let botonCancelar = crearButton("Eliminar", [], [atributoEliminar]);
             botonCancelar.onclick = function () {
                 divLista.remove();
             }
@@ -779,8 +811,8 @@
             let botonCrear = crearButton("Crear tabla");
             botonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaVariables, inputTitulo.value);
 
-            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
-            let buttonCancelar = crearButton("Cancelar",[],[atributoEliminar]);
+            let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
+            let buttonCancelar = crearButton("Cancelar", [], [atributoEliminar]);
 
             buttonCancelar.onclick = () => eliminarDiv(div);
 
@@ -829,8 +861,8 @@
             let buttonAgregar = crearButton("Agregar nombre columna");
             let buttonAceptar = crearButton("Aceptar");
 
-            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
-            let buttonCancelar = crearButton("Cancelar",[],[atributoEliminar]);
+            let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
+            let buttonCancelar = crearButton("Cancelar", [], [atributoEliminar]);
 
 
             let divListado = document.createElement("div");
@@ -902,8 +934,8 @@
             tabla.append(tbody);
 
 
-            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
-            let buttonCancelar = crearButton("Eliminar",[],[atributoEliminar]);
+            let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
+            let buttonCancelar = crearButton("Eliminar", [], [atributoEliminar]);
 
             buttonCancelar.addEventListener("onclick", function () { eliminarDiv(div) });
             buttonCancelar.addEventListener("onclick", function () { eliminarDiv(divFormularioEdicion) });
@@ -953,28 +985,34 @@
         */
         function agregarImagen(informacion = null) {
 
+            let atributoDiv = { ...atributo };
+            atributoDiv.atributo = "data-tipo";
+            atributoDiv.valor = "Imagen";
 
-            divFormularioEdicion = document.createElement("div");
+            let divFormularioEdicion = crearDiv([], [atributoDiv]);
+
             let buttonCrear = crearButton("Crear Imagen");
+            let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
+            let buttonCancelar = crearButton("Cancelar", [], [atributoEliminar]);
 
-            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
-            let buttonCancelar = crearButton("Cancelar",[],[atributoEliminar]);
             let { div: divInputImagen, input: inputImagen } = crearInputText("input", "Ingresa la url de la imagen", "url imagen");
+            let { div: divInputAlt, input: inputAlt } = crearInputText("input", "Ingresa el texto alterno de la imagen", "alt imagen");
 
             buttonCrear.onclick = function () {
 
-                crearImagenHtml(divFormularioEdicion, inputImagen.value);
+                crearImagenHtml(divFormularioEdicion, inputImagen.value, inputAlt.value);
             }
 
             buttonCancelar.onclick = () => eliminarDiv(divFormularioEdicion);
 
-            divFormularioEdicion.append(divInputImagen, buttonCrear, buttonCancelar);
+            divFormularioEdicion.append(divInputImagen, divInputAlt, buttonCrear, buttonCancelar);
             let opcionesMenu = document.getElementById("opcionesMenu");
             opcionesMenu.before(divFormularioEdicion);
 
             if (informacion) {
                 inputImagen.value = informacion.src;
-                crearImagenHtml(divFormularioEdicion, informacion.src);
+                inputAlt.value = informacion.alt ?? "";
+                crearImagenHtml(divFormularioEdicion, informacion.src, inputAlt.value);
             }
 
         }
@@ -985,9 +1023,9 @@
             let { div: divCodigo, input: inputCodigo } = crearInputText("textarea", "Ingresa el codigo a documentar", "Codigo");
 
             let buttonCrear = crearButton("Agregar Código");
-            
-            let atributoEliminar = {...atributo, "atributo":"data-tipo", "valor":"eliminar"};
-            let buttonCancelar = crearButton("Cancelar",[],[atributoEliminar]);
+
+            let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
+            let buttonCancelar = crearButton("Cancelar", [], [atributoEliminar]);
             buttonCancelar.onclick = () => eliminarDiv(divFormularioEdicion);
 
             buttonCrear.onclick = function () {
