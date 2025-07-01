@@ -251,18 +251,37 @@
          * funcion para editar las posiciones de los divs que se han editado actualmente
          * @param {HtmlDivElement} divActual - representa el div que ha hecho click en el boton de editar posicion
         */
-        function editarPosiciones(divActual) {
+        function editarPosiciones(divActual, button) {
+
+            console.log(button);
 
             let contenedor = document.getElementById("contenedor");
             let divs = contenedor.querySelectorAll("div:not(#opcionesMenu)");
 
+            divActual.querySelectorAll("div[data-modal='modal']");
+            //if (divBusqueda.length >0) console.log("ENCONTRE",divBusqueda);
+
             let divEdicion = crearDiv();
-            let ol = document.createElement("ol")
+            divEdicion.setAttribute("data-modal", "modal");
+            let tablaElementos = crearTablaHeader(["Tipo", "Id", "Accion"]);
+
+
+            //let ol = document.createElement("ol");
+
+            button.setAttribute("popovertarget", divEdicion.id);
+            //button.setAttribute("popovertargetaction", "show");
+
+            divEdicion.popover = 'manual';
+
+
             divs.forEach((dv) => {
 
-                let li = document.createElement("li");
+                //let li = document.createElement("li");
                 let id = dv.id
-                li.textContent = dv.id;
+
+                let tr = crearFilaFormularioTablaHtml([dv.dataset.nombre, dv.id]);
+
+                //li.textContent = `${dv.dataset.nombre}-${dv.id}`;
 
 
                 let buttonMover = crearButton("mover aqui")
@@ -276,13 +295,22 @@
 
                     divEdicion.remove();
                 }
-                if (dv !== divActual) li.append(buttonMover);
-                ol.append(li);
+
+                let td = document.createElement("td");
+                if (dv !== divActual) {
+                    td.append(buttonMover); 
+                    //li.append(buttonMover);
+                }
+                tr.append(td);
+                tablaElementos.append(tr);
+                //ol.append(li);
             });
             let buttonCancelar = crearButton("Cancelar");
             buttonCancelar.onclick = () => eliminarDiv(divEdicion);
+            let titulo = document.createElement("h3");
+            titulo.textContent = "Edicion de elementos"
 
-            divEdicion.append(ol, buttonCancelar);
+            divEdicion.append(titulo, tablaElementos,buttonCancelar);
             divActual.append(divEdicion);
         }
 
@@ -308,7 +336,7 @@
             let buttonPosicion = crearButton("Mover Posicion");
             buttonPosicion.addEventListener("click", function () {
 
-                editarPosiciones(divActual);
+                editarPosiciones(divActual, this);
 
             });
 
@@ -336,7 +364,7 @@
             }
 
             let atributoInformacion = { ...atributo, "atributo": "data-informacion", "valor": JSON.stringify(informacion) };
-            let atributoNombre = {...atributo, "atributo":"data-nombre", "valor":`texto-${informacion.etiqueta}`};
+            let atributoNombre = { ...atributo, "atributo": "data-nombre", "valor": `texto-${informacion.etiqueta}` };
             let atributos = [];
             atributos.push(atributoInformacion);
             atributos.push(atributoNombre);
@@ -445,7 +473,7 @@
             atributoInformacion.atributo = "data-informacion";
             atributoInformacion.valor = JSON.stringify(informacion);
 
-            let atributoNombre = {...atributo};
+            let atributoNombre = { ...atributo };
             atributoNombre.atributo = "data-nombre";
             atributoNombre.valor = "tabla";
 
@@ -526,7 +554,7 @@
             pre.id = generarTextoAleatorio(longitud);
 
             div.setAttribute("data-informacion", JSON.stringify(informacion));
-            div.setAttribute("data-nombre","codigo");
+            div.setAttribute("data-nombre", "codigo");
 
             let code = document.createElement("code");
             code.textContent = codigo;
@@ -1103,7 +1131,7 @@
                         agregarImagen(informacion);
                         break;
                     case TIPOS.codigo:
-                        console.log("codigo");
+                        agregarCodigo(informacion);
                         break;
                 }
 
