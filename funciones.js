@@ -5,7 +5,7 @@ const atributo = {
     "valor": ""
 }
 
-let TIPOS = {
+const TIPOS = {
     "texto": "texto",
     "lista": "lista",
     "tablaVariables": "tablaVariables",
@@ -14,7 +14,7 @@ let TIPOS = {
     "codigo": "codigo"
 }
 
-let OPCIONES_TEXTO = [
+const OPCIONES_TEXTO = [
     { "value": "h1", "texto": "H1" },
     { "value": "h2", "texto": "H2" },
     { "value": "h3", "texto": "H3" },
@@ -23,10 +23,23 @@ let OPCIONES_TEXTO = [
     { "value": "p", "texto": "p" }
 ];
 
+/*clases relacionadas a las tablas */
+const CLASES_TABLA = ["table", "table-sm", "table-bordered", "table-striped"];
+const CLASES_TBODY = ["table-group-divider"];
 
+/*
+clases relacionadas a los inputs
+ */
 const CLASES_INPUT_TEXTO = ["form-control", "form-control-sm"];
+const CLASES_INPUT_TEXTO_GRUPO_SPAN = ["input-group-text"];
+const CLASES_DIV_FORMLUARIO_GRUPO = ["input-group", "input-group-sm", "mb-3"];
 const CLASES_LABEL_TEXTO = ["form-label"];
 const CLASES_DIV_FORMULARIO = ["mb-3"];
+const CLASES_BUTTON_FORMULARIO_CANCELAR = ["btn", "btn-outline-danger", "btn-sm"];
+const CLASES_DIV_BOTONES_GRUPO = ["btn-group", "btn-group-sm"];
+const CLASES_DIV_CHECK = ["form-check"];
+const CLASES_INPUT_CHECK = ["form-check-input"];
+const CLASES_LABEL_CHECK = ["form-check-label"];
 
 /**
  * clases para el css de la edicion de los botones
@@ -37,8 +50,31 @@ const CLASES_BTN_ACTUALIZAR_HTML_EDICION = ["btn", "btn-outline-secondary", "btn
 /**
  * clases para agregar el icono de edicion en el boton actualizar en los elementos html
  */
-let CLASES_ICONO_BOTON_ACTUALIZAR = ["bi", "bi-pen-fill"];
+const CLASES_ICONO_BOTON_ACTUALIZAR = ["bi", "bi-pencil-square"];
+const CLASES_ICONO_BOTON_ELIMINAR = ["bi", "bi-trash"];
+const CLASES_ICONO_BOTON_MOVER = ["bi", "bi-arrows-move"];
+const CLASES_ICONO_BOTON_LISTA = ["bi", "bi-list-task"];
+const CLASES_ICONO_BOTON_CREAR = ["bi", "bi-arrow-right-square"];
+const CLASES_ICONO_BOTON_CANCELAR = ["bi", "bi-x-square"];
+const CLASES_ICONO_BOTON_AGREGAR = ["bi", "bi-plus-square"];
 
+
+/*ATRIBUTOS DATA TOGGLE*/
+
+const DATA_BS_TOGGLE = { ...atributo, "atributo": "data-bs-toggle", "valor":"popover"}
+const DATA_BS_TRIGGER = { ...atributo, "atributo":"data-bs-trigger", "valor":"hover focus"};
+const DATA_BS_CONTENT = { ...atributo, "atributo": "data-bs-content", "valor":""};
+
+/*BOTONES PERSONALIZADOS */
+
+const CLASES_BOTON_PERSONALIZADO = ['btn', 'btn-link', 'sidebar-link-group' , 'btn-sm'];
+
+
+/**
+ * Funcion para crear un texto aleatorio, eso se utiliza en todos los elementos dinamicos para generar un id unico, el id varia en cada ejecucion.
+ * @param {number} longitud - es la cantidad de caracteres que voy a utilizar para generar mi cadena de caracteres aleatoria
+ * @returns number
+ */
 function generarTextoAleatorio(longitud = longitud) {
     const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // Caracteres seguros para IDs
     let resultado = '';
@@ -56,32 +92,45 @@ function generarTextoAleatorio(longitud = longitud) {
  * @param {string} descripcionLabel - es el texto que tendra el label asignado al input
  * @param {bool} requierd - es el campo que define si el input es necesario, su valor por defecto es true
  * @param {bool} botonEliminar - variable que define si se agregara un boton para tener la opcion de eliminar el elemento creado.
+ * @returns {object} retorna un objeto del estilo { div: div, input: input }
 */
 function crearInputText(elemento, placeholder, descripcionLabel, required = true, botonEliminar = false) {
 
     id = generarTextoAleatorio(longitud);
-    let div = crearDiv(CLASES_DIV_FORMULARIO);
-
-    let label = document.createElement("label");
-    label.setAttribute("for", id);
-    label.textContent = descripcionLabel;
-
-    CLASES_LABEL_TEXTO.forEach(clase => label.classList.add(clase));
+    let div = undefined; //crearDiv(CLASES_DIV_FORMULARIO);
 
     let input = document.createElement(elemento);
     input.id = id;
     input.placeholder = placeholder;
     input.required = required;
+    CLASES_INPUT_TEXTO.forEach(clase => input.classList.add(clase));
 
-    CLASES_INPUT_TEXTO.forEach(clase => input.classList.add(clase))
 
-    div.append(label);
-    div.append(input);
-    if (botonEliminar) {
-        let buttonEliminar = crearButton("Eliminar");
+    if (!botonEliminar){
+        div = crearDiv(CLASES_DIV_FORMULARIO);
+        let label = document.createElement("label");
+        label.setAttribute("for", id);
+        label.textContent = descripcionLabel;
+        
+        CLASES_LABEL_TEXTO.forEach(clase => label.classList.add(clase));
+
+        div.append(label);
+        div.append(input);
+
+    }else{
+
+        div = crearDiv(CLASES_DIV_FORMLUARIO_GRUPO);
+        let span = document.createElement("span");
+        CLASES_INPUT_TEXTO_GRUPO_SPAN.forEach(clase => span.classList.add(clase));
+        span.textContent = descripcionLabel;
+        input.setAttribute("aria-describedby", "inputGroup-sizing-sm");
+        div.append(span, input);
+        let buttonEliminar = crearButton("", CLASES_BUTTON_FORMULARIO_CANCELAR, [], CLASES_ICONO_BOTON_CANCELAR);
         buttonEliminar.onclick = () => eliminarDiv(div);
         div.append(buttonEliminar);
+
     }
+
 
     return { div: div, input: input };
 
@@ -92,6 +141,7 @@ function crearInputText(elemento, placeholder, descripcionLabel, required = true
  * funcion para crear un div, al que le enviare una lista de clases y una lista de atributos segun sea necesario
  * @param {list[string]} clases - una lista de strings, cada string representa una clase a agregar
  * @param {list[object]} atributos - lista de objetos con claves {atributo, valor}, deben ser extendidos del objeto atributo
+ * @returns {HTMLDivElement} - retorna un elemento de tipo div
 */
 function crearDiv(clases = [], atributos = []) {
 
@@ -113,7 +163,7 @@ function crearDiv(clases = [], atributos = []) {
  * @param {list[string]} clases - son la lista de clases que se le agregaran al boton, por defecto esta vacio
  * @param {list[object]} atributos - lista de atributos a agregar al boton, por defecto esta vacio, tomar como base el objeto global atributo
  * @param {list[string]} clasesBi - lista de clases de iconos, si se agrega un arreglo de iconos, el boton automaticamente agregara un elemento i con las clases enviadas
- * 
+ * @returns {HTMLButtonElement} - retorna un elemento de tipo boton
 */
 function crearButton(textContent, clases = [], atributos = [], clasesBi = []) {
     let button = document.createElement("button");
@@ -138,6 +188,9 @@ function crearButton(textContent, clases = [], atributos = [], clasesBi = []) {
 
 /**
  * recibe como parametro una lista|arreglo de objetos {"value":str, "texto":str}
+ * @param {list[string]} opciones - es la lista de opciones qse agregaran a cada option en el select
+ * @param {*} descripcionLabel - es el texto que se le agrega al label
+ * @returns {object} - retorna un objeto del estilo { div: div, select: select }
 */
 function crearInputSelect(opciones, descripcionLabel) {
 
@@ -181,6 +234,33 @@ function crearInputSelect(opciones, descripcionLabel) {
 }
 
 /**
+ * 
+ * @param {string} descripcionLabel - es el texto de descripcion para el check a crear
+ * @returns {object} -retorna un objeto de la clase {div:div, input:input}
+ */
+function crearInputCheck(descripcionLabel){
+
+    let div = crearDiv(CLASES_DIV_CHECK);
+    let input = document.createElement("input");
+
+    input.type = "checkbox";
+    input.id = generarTextoAleatorio(longitud);
+
+    let label = document.createElement("label");
+    label.setAttribute("for", input.id);
+    label.textContent = descripcionLabel;
+    
+    CLASES_INPUT_CHECK.forEach(clase => input.classList.add(clase));
+    CLASES_LABEL_CHECK.forEach(clase => label.classList.add(clase));
+
+    div.append(label, input);
+
+    return {div:div, input:input};
+
+
+}
+
+/**
  *funcion para crear una tabla y agregar un header dado una lista de columnas
  *@param {list[string]} listaColumnas, es una lista de strings, cada uno representa una columna del header
  *  
@@ -191,6 +271,9 @@ function crearTablaHeader(listaColumnas) {
     let id = generarTextoAleatorio(longitud);
 
     let tabla = document.createElement("table");
+
+    CLASES_TABLA.forEach(clase => tabla.classList.add(clase));
+
     tabla.id = id;
 
     let thead = document.createElement("thead");
@@ -209,6 +292,7 @@ function crearTablaHeader(listaColumnas) {
     return tabla;
 
 }
+
 
 
 /**
@@ -255,10 +339,10 @@ function crearFilaFormularioTablaHtml(listaInputsHtml) {
 */
 function editarPosiciones(divActual, button) {
 
-    console.log(button);
+    //console.log(button);
 
     let contenedor = document.getElementById("contenedor");
-    let divs = contenedor.querySelectorAll("div:not(#opcionesMenu)");
+    let divs = contenedor.querySelectorAll("div:not(#opcionesMenu):not(.divEdicion)");
 
     divActual.querySelectorAll("div[data-modal='modal']");
     //if (divBusqueda.length >0) console.log("ENCONTRE",divBusqueda);
@@ -323,10 +407,14 @@ function editarPosiciones(divActual, button) {
 */
 function botonesEdicionHtml(divFormularioEdicion, divActual) {
 
-    let buttonActualizar = crearButton("Actualizar", CLASES_BTN_ACTUALIZAR_HTML_EDICION, [], CLASES_ICONO_BOTON_ACTUALIZAR);
+
+    let clasesBtn = ["btn", "btn-link", "dropdown-item", "sidebar-link"];
+
+    //CLASES_BTN_ACTUALIZAR_HTML_EDICION
+    let buttonActualizar = crearButton("Actualizar", clasesBtn, [], CLASES_ICONO_BOTON_ACTUALIZAR);
     buttonActualizar.onclick = () => RegresarAEdicionElemento(divFormularioEdicion, divActual);
 
-    let buttonEliminar = crearButton("Eliminar");
+    let buttonEliminar = crearButton("Eliminar", clasesBtn, [], CLASES_ICONO_BOTON_ELIMINAR);
 
     buttonEliminar.onclick = () => {
         eliminarDiv(divFormularioEdicion);
@@ -334,14 +422,50 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
 
     }
 
-    let buttonPosicion = crearButton("Mover Posicion");
+    let buttonPosicion = crearButton("Mover Posicion", clasesBtn, [], CLASES_ICONO_BOTON_MOVER);
     buttonPosicion.addEventListener("click", function () {
 
         editarPosiciones(divActual, this);
 
     });
 
-    divActual.append(buttonActualizar, buttonEliminar, buttonPosicion);
+
+    let divMenu = crearDiv(["d-flex","flex-row-reverse", "divEdicion"]);
+    let ulNav = document.createElement("ul");
+
+    let clasesUlNav = ["navbar-nav",  "mb-2", "mb-lg-0"];
+    clasesUlNav.forEach(clase => ulNav.classList.add(clase));
+
+    let liNav = document.createElement("li");
+    let clasesLiNav = ["nav-item", "dropdown"];
+    clasesLiNav.forEach(clase => liNav.classList.add(clase));
+
+    let clasesButton = ["btn", "btn-link", "nav-link", "dropdown-toggle"];
+    let atributo1 = {...atributo, "atributo":"data-bs-toggle", "valor":"dropdown"};
+    let atributo2 = {...atributo, "atributo":"aria-expanded", "valor":"false"};
+
+    let buttonLink = crearButton("", clasesButton, [atributo1, atributo2], ["bi","bi-gear"]);
+
+    let ulOptions = document.createElement("ul");
+    let clasesUlOpciones = ["dropdown-menu", "sidebar-nav"]
+    clasesUlOpciones.forEach(clase => ulOptions.classList.add(clase));
+
+    let liActualizar = document.createElement("li");
+    let liEliminar = document.createElement("li");
+    let liMover = document.createElement("li");
+
+    liActualizar.append(buttonActualizar);
+    liEliminar.append(buttonEliminar);
+    liMover.append(buttonPosicion);
+
+    ulOptions.append(liActualizar, liEliminar, liMover);
+
+    liNav.append(buttonLink, ulOptions);
+    ulNav.append(liNav);
+    divMenu.append(ulNav);
+
+    divActual.prepend(divMenu);
+    //divActual.append(buttonActualizar, buttonEliminar, buttonPosicion);
 
 }
 
@@ -352,10 +476,10 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
  * @param {string} texto: el texto que se mostrara en el html
  * @param {string} palabrasImportantes: cadena de caracteres de las palabras que seran remarcadas, estas estan separadas por comas
  * @param {HtmlDivElement} divCrearParrafo: div que contiene el elemento a crear
- * @param {HtmlDivElement} contenedor: div central donde se almacenan los demas elementos
+ * @param {string} esTitulo: -es el valor del inputCheck
  * 
 */
-function crearTextoHtml(etiqueta, texto, palabrasImportantes, divCrearParrafo, contenedor) {
+function crearTextoHtml(etiqueta, texto, palabrasImportantes, divCrearParrafo, esTitulo) {
 
     let informacion = {
         "tipoCreacion": TIPOS.texto,
@@ -412,7 +536,7 @@ function RegresarAEdicionElemento(divActualizar, div, agregarBtnCancelar = true)
         if (!busqueda) {
             let button = divActualizar.querySelector('button[data-tipo="eliminar"]');
 
-            let buttonCancelar = crearButton("Cancelar Cambios");
+            let buttonCancelar = crearButton("Cancelar Cambios", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CANCELAR);
             buttonCancelar.setAttribute("data-tipo", "cancelar");
 
             buttonCancelar.onclick = function () {
@@ -446,13 +570,14 @@ function crearTablaHtml(headers, tabla, divFormularioEdicion, tipoTabla, tituloT
         "detalleInformacion": []
     }
 
-    let titulo = document.createElement("h3");
+    let titulo = document.createElement("h4");
     if (tituloTabla && tituloTabla != "") titulo.textContent = tituloTabla;
 
 
     let tablaHtml = crearTablaHeader(headers);
 
     let tbodyHtml = document.createElement("tbody");
+    CLASES_TBODY.forEach(clase => tbodyHtml.classList.add(clase));
 
     let filas = tabla.querySelectorAll("tbody >tr");
     for (const fila of filas) {
@@ -579,7 +704,7 @@ function crearListaHtml(divFormularioEdicion, tipoLista, tituloLista = "") {
         "valoresLi": []
     }
 
-    let titulo = document.createElement("h3");
+    let titulo = document.createElement("h4");
     if (tituloLista && tituloLista != "") {
 
         titulo.textContent = tituloLista;
@@ -642,14 +767,23 @@ function agregarParrafo(informacion = null) {
 
     let { div: divFormGroupSelect, select: selectTexto } = crearInputSelect(OPCIONES_TEXTO, "Tipo de texto a insertar");
 
+    let {div:divCheck, inpu:inputCheck} = crearInputCheck("Tema");
+
     //agrego la funcionalidad onchange en el select texto para que cuando sea un parrafo el que voy a agregar agrege la capacidad de
     //agregar una lista de palabras reservadas con inputPalabrasImportantes
 
     selectTexto.onchange = function () {
+
         if (selectTexto.value == "p")
             divFormGroup.after(divFormGroupPalabrasImportantes);
         else
             divFormGroupPalabrasImportantes.remove();
+
+       
+        if (String(selectTexto.value).match(/^[hH]\d/))
+            divFormGroup.after(divCheck);
+        else
+            divCheck.remove();
     }
 
     divSelect.appendChild(divFormGroupSelect);
@@ -658,7 +792,7 @@ function agregarParrafo(informacion = null) {
 
     //se agrega boton crear
 
-    let botonCrear = crearButton("Aceptar");
+    let botonCrear = crearButton("Aceptar", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CREAR);
 
     //se agrega la funcion que va a generar el HTML del texto y sus funcionalidades para regresar al modo de edicion
     botonCrear.onclick = function () {
@@ -671,7 +805,7 @@ function agregarParrafo(informacion = null) {
     }
 
     let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
-    let botonCancelar = crearButton("Eliminar", [], [atributoEliminar]);
+    let botonCancelar = crearButton("Eliminar", CLASES_BOTON_PERSONALIZADO, [atributoEliminar], CLASES_ICONO_BOTON_ELIMINAR);
 
     botonCancelar.onclick = function () {
         divCrearParrafo.remove();
@@ -715,48 +849,55 @@ function agregarLista(informacion = null) {
 
     //primero que todo, creo un select el cual tiene el tipo de lista que voy a usar
 
-    let { div: divSelectLista, select: selectLista } = crearInputSelect(tiposLista, "Selecciona la lista");
-    let { div: divTituloLista, input: inputTitulo } = crearInputText("input", "ingresa el titulo", "titulo lista");
+    let { div: divSelectLista, select: selectLista } = crearInputSelect(tiposLista, "Selecciona el tipo de lista");
+    let { div: divTituloLista, input: inputTitulo } = crearInputText("input", "ingresa el titulo (opcional)", "titulo lista");
 
-    divLista.appendChild(divSelectLista);
+    divLista.append(divSelectLista);
     divLista.append(divTituloLista);
 
     //creo un nuevo div, este es para guardar todos los input que se van a crear de manera dinamica para todas los li de la lista
-    let divElementosLista = document.createElement("div");
-    divElementosLista.classList.add("miLista");
+    let divElementosLista = crearDiv(["miLista"]);
 
     //creo un boton el cual va a crear los input que van a almacenar la info de los li que voy a crear
 
-    let botonAgregarOpcion = crearButton("Agregar opcion");
+    let listaToggle = [DATA_BS_TOGGLE, DATA_BS_TRIGGER, {...DATA_BS_CONTENT,"valor":"Agrega un nuevo item a la lista"}]
+    let botonAgregarOpcion = crearButton("Agregar item", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA  );
+
+    const popOverInstance = new bootstrap.Popover(botonAgregarOpcion);
 
     //esta funcion se encarga de crear un input y su boton para eliminar el mismo si no lo necesito
     botonAgregarOpcion.onclick = () => {
 
         let { div: divInput, input: input } = crearInputText("input", "Ingresa la descripcion de la opcion de lista", "item", false, true);
-        botonAgregarOpcion.before(divInput);
+        divElementosLista.append(divInput);
+        popOverInstance.hide();
 
     }
+    let divMenuBotones = crearDiv(CLASES_DIV_BOTONES_GRUPO);
 
-    divElementosLista.appendChild(botonAgregarOpcion)
-    divLista.appendChild(divElementosLista);
+    //divElementosLista.appendChild(botonAgregarOpcion)
+    divLista.append(divElementosLista);
 
     //se crea el boton para cancelar todo el elemento de lista que estoy creando;
     let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
 
-    let botonCancelar = crearButton("Eliminar", [], [atributoEliminar]);
+    let botonCancelar = crearButton("Eliminar", CLASES_BOTON_PERSONALIZADO, [atributoEliminar], CLASES_ICONO_BOTON_ELIMINAR);
     botonCancelar.onclick = function () {
         divLista.remove();
     }
 
 
-    let botonCrearLista = crearButton("Crear Lista");
+    let botonCrearLista = crearButton("Crear Lista", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CREAR);
+
     botonCrearLista.onclick = function () {
 
         crearListaHtml(divLista, selectLista.value, inputTitulo.value);
     }
 
+    divMenuBotones.append(botonAgregarOpcion, botonCrearLista, botonCancelar);
 
-    divLista.append(botonCrearLista, botonCancelar);
+    //divLista.append(botonCrearLista, botonCancelar);
+    divLista.append(divMenuBotones);
     opcionesMenu.before(divLista);
 
     divLista.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -769,7 +910,7 @@ function agregarLista(informacion = null) {
         informacion.valoresLi.forEach(li => {
             let { div: divInput, input: input } = crearInputText("input", "Ingresa la descripcion de la opcion de lista", "item", false, true);
             input.value = li;
-            botonAgregarOpcion.before(divInput);
+            divElementosLista.append(divInput);
         });
 
         crearListaHtml(divLista, informacion.tipoSelect);
@@ -834,17 +975,17 @@ function agregarTablaVariables(informacion = null) {
 
     tabla.append(tbody);
 
-    let botonAgregarFila = crearButton("Agregar Fila");
+    let botonAgregarFila = crearButton("Agregar Fila", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA);
     botonAgregarFila.onclick = function () {
         let tr = crearFilaFormularioTabla(listaInputs);
         tbody.append(tr);
     }
 
-    let botonCrear = crearButton("Crear tabla");
+    let botonCrear = crearButton("Crear tabla", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CREAR);
     botonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaVariables, inputTitulo.value);
 
     let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
-    let buttonCancelar = crearButton("Cancelar", [], [atributoEliminar]);
+    let buttonCancelar = crearButton("Eliminar", CLASES_BOTON_PERSONALIZADO, [atributoEliminar], CLASES_ICONO_BOTON_ELIMINAR);
 
     buttonCancelar.onclick = () => eliminarDiv(div);
 
@@ -889,17 +1030,17 @@ function agregarTablaDinamica(informacion = null) {
 
     let headers = [];
 
-    let div = document.createElement("div");
+    let div = crearDiv();
 
 
-    let buttonAgregar = crearButton("Agregar nombre columna");
-    let buttonAceptar = crearButton("Aceptar");
+    let buttonAgregar = crearButton("Agregar nombre columna", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA);
+    let buttonAceptar = crearButton("Aceptar", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CREAR);
 
     let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
-    let buttonCancelar = crearButton("Cancelar", [], [atributoEliminar]);
+    let buttonCancelar = crearButton("Cancelar", CLASES_BOTON_PERSONALIZADO, [atributoEliminar], CLASES_ICONO_BOTON_ELIMINAR);
 
 
-    let divListado = document.createElement("div");
+    let divListado = crearDiv();
 
     buttonAgregar.onclick = function () {
 
@@ -971,22 +1112,22 @@ function agregarTablaDinamicaInformacion(divFormularioEdicion, headers, informac
 
 
     let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
-    let buttonCancelar = crearButton("Eliminar", [], [atributoEliminar]);
+    let buttonCancelar = crearButton("Eliminar", CLASES_BOTON_PERSONALIZADO, [atributoEliminar], CLASES_ICONO_BOTON_ELIMINAR);
 
     buttonCancelar.addEventListener("onclick", function () { eliminarDiv(div) });
     buttonCancelar.addEventListener("onclick", function () { eliminarDiv(divFormularioEdicion) });
 
-    let buttonAgregarFila = crearButton("Agregar fila");
+    let buttonAgregarFila = crearButton("Agregar fila",CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA);
 
     buttonAgregarFila.onclick = function () {
         let tr = crearFilaFormularioTabla(listaInputs);
         tbody.append(tr);
     }
 
-    let buttonActualizarHeader = crearButton("Editar Encabezado");
+    let buttonActualizarHeader = crearButton("Editar Encabezado", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_ACTUALIZAR);
     buttonActualizarHeader.onclick = () => RegresarAEdicionElemento(divFormularioEdicion, div);
 
-    let buttonCrear = crearButton("Crear Tabla");
+    let buttonCrear = crearButton("Crear Tabla", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CREAR);
 
     buttonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica, inputTitulo.value);
     div.append(divTituloTabla, tabla, buttonAgregarFila, buttonCrear, buttonActualizarHeader, buttonCancelar);

@@ -21,7 +21,7 @@ h1 {
 }
 
 body {
-    font-family: 'Poppins', 'sans-sefit';
+    font-family: 'Poppins', 'poppins';
 }
 
 .wrapper {
@@ -34,8 +34,7 @@ body {
     width: 100%;
     transition: all 0.35 ease-in-out;
     text-align: justify;
-    overflow-y: auto;
-    overflow-x: hidden;
+
 
 }
 
@@ -140,19 +139,27 @@ button.sidebar-link {
     justify-content: flex-start; /* Alinea los ítems horizontalmente al inicio (izquierda) */
     /* Si quieres que estén espaciados, podrías usar justify-content: space-between; */
 
-    
+}
+
+button.sidebar-link-group {
+
+   /* color: rgb(14, 34, 62);*/
+    font-size: 0.9rem;
+    white-space: nowrap;
+    text-decoration: none;
+    color: inherit;
+    border-color: var(--sidebar-link-hover-button);
 
 }
 
-.sidebar-link i {
+
+.sidebar-link i, .sidebar-link-group i {
     font-size: 1.1 rem;
     margin-right: .75rem;
 }
-.sidebar-link i span{
+.sidebar-link i span, .sidebar-link-group i span{
     padding: 0.5rem;
 }
-
-
 
 a.sidebar-link:hover {
     background-color: var(--sidebar-link-hover-bg);
@@ -165,7 +172,11 @@ button.sidebar-link:hover {
     color: inherit;
 }
 
-
+button.sidebar-link-group:hover {
+    background-color: var(--sidebar-link-hover-button);
+    text-decoration: none !important;
+    color: inherit;
+}
 
 .b-example-divider {
     width: 0.5%;
@@ -178,10 +189,12 @@ button.sidebar-link:hover {
 
 :root {
     --sidebar-link-hover-bg :rgb(14, 34, 62, .075);
+    --sidebar-link-hover-button: rgb(14, 34, 62, .090);
 }
 
 html[data-bs-theme="dark"]{
     --sidebar-link-hover-bg :rgb(255, 255, 255, .075);
+    --sidebar-link-hover-button: rgb(255, 255, 255, .090);
 }
 
 #temas h6{
