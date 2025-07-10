@@ -40,6 +40,9 @@ const CLASES_DIV_BOTONES_GRUPO = ["btn-group", "btn-group-sm"];
 const CLASES_DIV_CHECK = ["form-check"];
 const CLASES_INPUT_CHECK = ["form-check-input"];
 const CLASES_LABEL_CHECK = ["form-check-label"];
+const CLASES_LINK = ["link-body-emphasis", "link-offset-2", "link-underline-pacity-0", "link-underline-opacity-75-hover"]
+const CLASES_LINK_PERSONALIZADO = ['sidebar-link'];
+const CLASES_LINK_PERSONALIZADO_TEMAS = ['sidebar-link-menu', 'link-tema', "link-underline-pacity-0", "link-underline-opacity-75-hover"];
 
 /**
  * clases para el css de la edicion de los botones
@@ -61,13 +64,14 @@ const CLASES_ICONO_BOTON_AGREGAR = ["bi", "bi-plus-square"];
 
 /*ATRIBUTOS DATA TOGGLE*/
 
-const DATA_BS_TOGGLE = { ...atributo, "atributo": "data-bs-toggle", "valor":"popover"}
-const DATA_BS_TRIGGER = { ...atributo, "atributo":"data-bs-trigger", "valor":"hover focus"};
-const DATA_BS_CONTENT = { ...atributo, "atributo": "data-bs-content", "valor":""};
+const DATA_BS_TOGGLE = { ...atributo, "atributo": "data-bs-toggle", "valor": "popover" }
+const DATA_BS_TRIGGER = { ...atributo, "atributo": "data-bs-trigger", "valor": "hover focus" };
+const DATA_BS_CONTENT = { ...atributo, "atributo": "data-bs-content", "valor": "" };
 
 /*BOTONES PERSONALIZADOS */
 
-const CLASES_BOTON_PERSONALIZADO = ['btn', 'btn-link', 'sidebar-link-group' , 'btn-sm'];
+const CLASES_BOTON_PERSONALIZADO = ['btn', 'btn-link', 'sidebar-link-group', 'btn-sm'];
+const CLASES_LI_PERSONALIZADO = ['sidebar-item'];
 
 
 /**
@@ -106,18 +110,18 @@ function crearInputText(elemento, placeholder, descripcionLabel, required = true
     CLASES_INPUT_TEXTO.forEach(clase => input.classList.add(clase));
 
 
-    if (!botonEliminar){
+    if (!botonEliminar) {
         div = crearDiv(CLASES_DIV_FORMULARIO);
         let label = document.createElement("label");
         label.setAttribute("for", id);
         label.textContent = descripcionLabel;
-        
+
         CLASES_LABEL_TEXTO.forEach(clase => label.classList.add(clase));
 
         div.append(label);
         div.append(input);
 
-    }else{
+    } else {
 
         div = crearDiv(CLASES_DIV_FORMLUARIO_GRUPO);
         let span = document.createElement("span");
@@ -238,7 +242,7 @@ function crearInputSelect(opciones, descripcionLabel) {
  * @param {string} descripcionLabel - es el texto de descripcion para el check a crear
  * @returns {object} -retorna un objeto de la clase {div:div, input:input}
  */
-function crearInputCheck(descripcionLabel){
+function crearInputCheck(descripcionLabel) {
 
     let div = crearDiv(CLASES_DIV_CHECK);
     let input = document.createElement("input");
@@ -249,13 +253,132 @@ function crearInputCheck(descripcionLabel){
     let label = document.createElement("label");
     label.setAttribute("for", input.id);
     label.textContent = descripcionLabel;
-    
+
     CLASES_INPUT_CHECK.forEach(clase => input.classList.add(clase));
     CLASES_LABEL_CHECK.forEach(clase => label.classList.add(clase));
 
     div.append(label, input);
 
-    return {div:div, input:input};
+    return { div: div, input: input };
+
+
+}
+
+/**
+ * funcion para crear un link
+ * @param {string} href - es el sitio al cual dirigira el link
+ * @param {string} descripcion - es la descripcion que aparecera en el html
+ * @param {list[string]} clases - lista de clases que se le agregaran al elemento html anchor (link)
+ * @returns {object} - returna un objeto del tipo {div:HtmlDivElement, link:HtmlAnchorElement}
+ */
+function crearLink(href, descripcion, clases) {
+    let div = crearDiv();
+    let link = document.createElement("a");
+    let span = document.createElement("span");
+    link.href = href;
+    clases.forEach(clase => link.classList.add(clase));
+    span.textContent = descripcion;
+    link.append(span);
+    div.append(link);
+
+    return { div: div, link: link };
+}
+
+/**
+ * funcion que agrega un tema a la lista de temas en la barra derecha del documento a crear
+ * @param {string} hrefId - es el id al cual lleva la propiedad href del link a crear
+ * @param {string} descripcion - es la descripcion que aparecera en el link
+ */
+function agregarTemaMenu(hrefId, descripcion) {
+
+    let spans = document.querySelectorAll(`ul#ulTemas >li >a >span`);
+
+    if (Array.from(spans).filter(x => x.textContent === descripcion).length > 0)
+        return
+
+    let { link: link } = crearLink(hrefId, descripcion, CLASES_LINK_PERSONALIZADO_TEMAS);
+    let ulTemas = document.getElementById("ulTemas");
+    let li = document.createElement("li");
+    CLASES_LI_PERSONALIZADO.forEach(clase => li.classList.add(clase));
+    li.append(link);
+
+
+    /*
+    en esta seccion lo que se hace es buscar la posicion donde se debe insertar el tema
+    se buscan todos los temas 
+     */
+    let contenedor = document.getElementById("contenedor");
+    let temas = contenedor.querySelectorAll('div[data-tema="tema"].parrafo >h1, div[data-tema="tema"].parrafo >h2, div[data-tema="tema"].parrafo >h3, div[data-tema="tema"].parrafo >h4');
+
+    if (temas.length > 0) {
+        let arrayTemas = Array.from(temas);
+        let indice = arrayTemas.findIndex(x => x.id === String(hrefId).replace("#", ""));
+
+        if (indice == -1 || indice == arrayTemas.length - 1)
+            ulTemas.append(li);
+        else {
+            let indiceBusqueda = `#${temas[indice + 1].id}`;
+            let elemento = document.querySelector(`a[href="${indiceBusqueda}"]`);
+
+            if (elemento){
+                liPadre = elemento.closest('li');
+                liPadre.before(li);
+            }else{
+                ulTemas.append(li)
+            }
+
+
+        }
+
+    } else {
+
+        ulTemas.append(li);
+    }
+}
+
+
+/**
+ * funcion para eliminar un item de la lista de temas, se usa cuando actualizo un texto que era un tema y ya no quiero que lo sea
+ * buscar por la descripcion del tema que estoy enviando
+ * @param {string} descripcion 
+ */
+function eliminarTemaMenu(descripcion) {
+
+    let spans = document.querySelectorAll(`ul#ulTemas >li >a >span`);
+
+    let arraySpan = Array.from(spans);
+
+    let indice = arraySpan.findIndex(x => x.textContent === descripcion);
+    if (indice > -1) {
+        let a = spans[indice].closest('a');
+        let li = a.closest("li");
+
+        li.remove();
+    }
+
+}
+
+function crearMenusPorReordenamiento() {
+
+    let ul = document.getElementById("ulTemas");
+
+    if (ul) {
+
+        //primero vamos a eliminar todos los menus
+        let listaLi = ul.querySelectorAll('li');
+        Array.from(listaLi).forEach(li => li.remove());
+
+        let temas = document.getElementById('contenedor').querySelectorAll('div[data-tema="tema"].parrafo >h1, div[data-tema="tema"].parrafo >h2, div[data-tema="tema"].parrafo >h3, div[data-tema="tema"].parrafo >h4');
+
+        temas.forEach(tema =>{
+            let id = tema.id;
+            let descripcion = tema.textContent;
+
+            console.log("VAMOS A VER QUE LE ENVIO:", id, descripcion);
+            agregarTemaMenu(`#${id}`, descripcion);
+        });
+
+    }
 
 
 }
@@ -380,6 +503,7 @@ function editarPosiciones(divActual, button) {
                 div.before(divActual);
 
             divEdicion.remove();
+            crearMenusPorReordenamiento();
         }
 
         let td = document.createElement("td");
@@ -430,10 +554,10 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
     });
 
 
-    let divMenu = crearDiv(["d-flex","flex-row-reverse", "divEdicion"]);
+    let divMenu = crearDiv(["d-flex", "flex-row-reverse", "divEdicion"]);
     let ulNav = document.createElement("ul");
 
-    let clasesUlNav = ["navbar-nav",  "mb-2", "mb-lg-0"];
+    let clasesUlNav = ["navbar-nav", "mb-2", "mb-lg-0"];
     clasesUlNav.forEach(clase => ulNav.classList.add(clase));
 
     let liNav = document.createElement("li");
@@ -441,10 +565,10 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
     clasesLiNav.forEach(clase => liNav.classList.add(clase));
 
     let clasesButton = ["btn", "btn-link", "nav-link", "dropdown-toggle"];
-    let atributo1 = {...atributo, "atributo":"data-bs-toggle", "valor":"dropdown"};
-    let atributo2 = {...atributo, "atributo":"aria-expanded", "valor":"false"};
+    let atributo1 = { ...atributo, "atributo": "data-bs-toggle", "valor": "dropdown" };
+    let atributo2 = { ...atributo, "atributo": "aria-expanded", "valor": "false" };
 
-    let buttonLink = crearButton("", clasesButton, [atributo1, atributo2], ["bi","bi-gear"]);
+    let buttonLink = crearButton("", clasesButton, [atributo1, atributo2], ["bi", "bi-gear"]);
 
     let ulOptions = document.createElement("ul");
     let clasesUlOpciones = ["dropdown-menu", "sidebar-nav"]
@@ -469,6 +593,7 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
 
 }
 
+
 /**
  * esta funcion esta dise;ada para crear elementos HTML de tipo texto
  * 
@@ -476,7 +601,7 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
  * @param {string} texto: el texto que se mostrara en el html
  * @param {string} palabrasImportantes: cadena de caracteres de las palabras que seran remarcadas, estas estan separadas por comas
  * @param {HtmlDivElement} divCrearParrafo: div que contiene el elemento a crear
- * @param {string} esTitulo: -es el valor del inputCheck
+ * @param {boolean} esTitulo: -es el valor del inputCheck
  * 
 */
 function crearTextoHtml(etiqueta, texto, palabrasImportantes, divCrearParrafo, esTitulo) {
@@ -485,7 +610,8 @@ function crearTextoHtml(etiqueta, texto, palabrasImportantes, divCrearParrafo, e
         "tipoCreacion": TIPOS.texto,
         "etiqueta": etiqueta,
         "texto": texto,
-        "palabrasImportantes": palabrasImportantes
+        "palabrasImportantes": palabrasImportantes,
+        "esTitulo": esTitulo
     }
 
     let atributoInformacion = { ...atributo, "atributo": "data-informacion", "valor": JSON.stringify(informacion) };
@@ -494,15 +620,11 @@ function crearTextoHtml(etiqueta, texto, palabrasImportantes, divCrearParrafo, e
     atributos.push(atributoInformacion);
     atributos.push(atributoNombre);
 
-    let div = crearDiv([], atributos);
+    let div = crearDiv(["parrafo"], atributos);
 
     let parrafo = document.createElement(etiqueta);
     parrafo.id = generarTextoAleatorio(longitud);
-    parrafo.className = "parrafo";
-
-    //let texto = /*inputParrafo.value*/ texto;
-
-    //parrafo.popover = "vamos a hacer una prueba del popover"
+    //parrafo.className = "parrafo";
 
     if (etiqueta == "p" && palabrasImportantes.trim().trimStart().trimEnd() != "") {
         let arregloPalabras = palabrasImportantes.split(",");
@@ -518,6 +640,16 @@ function crearTextoHtml(etiqueta, texto, palabrasImportantes, divCrearParrafo, e
 
     divCrearParrafo.before(div);
     divCrearParrafo.remove();
+
+    if (esTitulo) {
+        div.setAttribute("data-tema", "tema");
+        crearMenusPorReordenamiento();
+        //agregarTemaMenu(`#${parrafo.id}`, texto);
+    } else {
+        console.log("vamosa  ver que pedos");
+        div.removeAttribute("data-tema");
+        eliminarTemaMenu(texto);
+    }
 
 
 }
@@ -767,7 +899,7 @@ function agregarParrafo(informacion = null) {
 
     let { div: divFormGroupSelect, select: selectTexto } = crearInputSelect(OPCIONES_TEXTO, "Tipo de texto a insertar");
 
-    let {div:divCheck, inpu:inputCheck} = crearInputCheck("Tema");
+    let { div: divCheck, input: inputCheck } = crearInputCheck("Tema");
 
     //agrego la funcionalidad onchange en el select texto para que cuando sea un parrafo el que voy a agregar agrege la capacidad de
     //agregar una lista de palabras reservadas con inputPalabrasImportantes
@@ -779,7 +911,7 @@ function agregarParrafo(informacion = null) {
         else
             divFormGroupPalabrasImportantes.remove();
 
-       
+
         if (String(selectTexto.value).match(/^[hH]\d/))
             divFormGroup.after(divCheck);
         else
@@ -801,7 +933,7 @@ function agregarParrafo(informacion = null) {
             texto = inputParrafo.value,
             palabrasImportantes = inputPalabrasImportantes.value,
             divCrearParrafo = divCrearParrafo,
-            contenedor = contenedor);
+            esTitulo = inputCheck.checked);
     }
 
     let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
@@ -819,7 +951,7 @@ function agregarParrafo(informacion = null) {
         selectTexto.value = informacion.etiqueta;
         inputParrafo.value = informacion.texto;
         inputPalabrasImportantes.value = informacion.palabrasImportantes;
-        crearTextoHtml(informacion.etiqueta, informacion.texto, informacion.palabrasImportantes, divCrearParrafo, contenedor);
+        crearTextoHtml(informacion.etiqueta, informacion.texto, informacion.palabrasImportantes, divCrearParrafo, informacion.esTitulo ?? false);
     }
 
 
@@ -860,8 +992,8 @@ function agregarLista(informacion = null) {
 
     //creo un boton el cual va a crear los input que van a almacenar la info de los li que voy a crear
 
-    let listaToggle = [DATA_BS_TOGGLE, DATA_BS_TRIGGER, {...DATA_BS_CONTENT,"valor":"Agrega un nuevo item a la lista"}]
-    let botonAgregarOpcion = crearButton("Agregar item", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA  );
+    let listaToggle = [DATA_BS_TOGGLE, DATA_BS_TRIGGER, { ...DATA_BS_CONTENT, "valor": "Agrega un nuevo item a la lista" }]
+    let botonAgregarOpcion = crearButton("Agregar item", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA);
 
     const popOverInstance = new bootstrap.Popover(botonAgregarOpcion);
 
@@ -1117,7 +1249,7 @@ function agregarTablaDinamicaInformacion(divFormularioEdicion, headers, informac
     buttonCancelar.addEventListener("onclick", function () { eliminarDiv(div) });
     buttonCancelar.addEventListener("onclick", function () { eliminarDiv(divFormularioEdicion) });
 
-    let buttonAgregarFila = crearButton("Agregar fila",CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA);
+    let buttonAgregarFila = crearButton("Agregar fila", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA);
 
     buttonAgregarFila.onclick = function () {
         let tr = crearFilaFormularioTabla(listaInputs);

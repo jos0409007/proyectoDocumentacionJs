@@ -161,7 +161,7 @@ button.sidebar-link-group {
     padding: 0.5rem;
 }
 
-a.sidebar-link:hover {
+a.sidebar-link:hover, a.sidebar-link-menu:hover {
     background-color: var(--sidebar-link-hover-bg);
 
 }
@@ -199,4 +199,23 @@ html[data-bs-theme="dark"]{
 
 #temas h6{
     padding: 1rem 1.5rem;
+}
+
+
+a.sidebar-link-menu{
+    padding: .625rem 1.625rem;
+   /* color: rgb(14, 34, 62);*/
+    display: block;
+    font-size: 0.9rem;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+    color: inherit;
+
+}
+
+.link-tema span{
+    width: 20%;
+    font-size: smaller;
+    word-wrap: break-word;
+    /*overflow-wrap: break-word;*/
 }
