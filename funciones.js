@@ -31,6 +31,7 @@ const CLASES_TBODY = ["table-group-divider"];
 clases relacionadas a los inputs
  */
 const CLASES_INPUT_TEXTO = ["form-control", "form-control-sm"];
+const CLASES_INPUT_RANGO = ["form-range"];
 const CLASES_INPUT_TEXTO_GRUPO_SPAN = ["input-group-text"];
 const CLASES_DIV_FORMLUARIO_GRUPO = ["input-group", "input-group-sm", "mb-3"];
 const CLASES_LABEL_TEXTO = ["form-label"];
@@ -41,8 +42,14 @@ const CLASES_DIV_CHECK = ["form-check"];
 const CLASES_INPUT_CHECK = ["form-check-input"];
 const CLASES_LABEL_CHECK = ["form-check-label"];
 const CLASES_LINK = ["link-body-emphasis", "link-offset-2", "link-underline-pacity-0", "link-underline-opacity-75-hover"]
-const CLASES_LINK_PERSONALIZADO = ['sidebar-link'];
-const CLASES_LINK_PERSONALIZADO_TEMAS = ['sidebar-link-menu', 'link-tema', "link-underline-pacity-0", "link-underline-opacity-75-hover"];
+const CLASES_DIV_BORDE = ["border", "p-2", "mb-2", "border-opacity-75"];
+
+
+/**
+ * clases para imagenes
+ */
+
+const CLASES_IMAGENES = ["rounded", "mx-auto", "d-block", "p-2"];
 
 /**
  * clases para el css de la edicion de los botones
@@ -68,10 +75,12 @@ const DATA_BS_TOGGLE = { ...atributo, "atributo": "data-bs-toggle", "valor": "po
 const DATA_BS_TRIGGER = { ...atributo, "atributo": "data-bs-trigger", "valor": "hover focus" };
 const DATA_BS_CONTENT = { ...atributo, "atributo": "data-bs-content", "valor": "" };
 
-/*BOTONES PERSONALIZADOS */
+/*CLASES PERSONALIZADAS */
 
 const CLASES_BOTON_PERSONALIZADO = ['btn', 'btn-link', 'sidebar-link-group', 'btn-sm'];
 const CLASES_LI_PERSONALIZADO = ['sidebar-item'];
+const CLASES_LINK_PERSONALIZADO = ['sidebar-link'];
+const CLASES_LINK_PERSONALIZADO_TEMAS = ['sidebar-link-menu', 'link-tema', "link-underline-pacity-0", "link-underline-opacity-75-hover"];
 
 
 /**
@@ -88,6 +97,40 @@ function generarTextoAleatorio(longitud = longitud) {
     return resultado;
 }
 
+/*
+function crearInputForm(input, descripcionLabel) {
+
+    let div = crearDiv(CLASES_DIV_FORMULARIO);
+    let label = document.createElement("label");
+
+    label.setAttribute("for", id);
+    label.textContent = descripcionLabel;
+
+    CLASES_LABEL_TEXTO.forEach(clase => label.classList.add(clase));
+
+    div.append(label);
+    div.append(input);
+
+    return div;
+
+}
+
+function crearInputGroup(input, descripcionLabel, labelButton, func) {
+
+
+    div = crearDiv(CLASES_DIV_FORMLUARIO_GRUPO);
+    let span = document.createElement("span");
+    CLASES_INPUT_TEXTO_GRUPO_SPAN.forEach(clase => span.classList.add(clase));
+    span.textContent = descripcionLabel;
+    input.setAttribute("aria-describedby", "inputGroup-sizing-sm");
+    div.append(span, input);
+    let buttonEliminar = crearButton("", CLASES_BUTTON_FORMULARIO_CANCELAR, [], CLASES_ICONO_BOTON_CANCELAR);
+    buttonEliminar.onclick = () => eliminarDiv(div);
+    div.append(buttonEliminar);
+
+
+}
+*/
 
 /**
  * funcion que crea un input de tipo texto
@@ -134,6 +177,7 @@ function crearInputText(elemento, placeholder, descripcionLabel, required = true
         div.append(buttonEliminar);
 
     }
+
 
 
     return { div: div, input: input };
@@ -265,6 +309,33 @@ function crearInputCheck(descripcionLabel) {
 }
 
 /**
+ * 
+ * @param {string} descripcionLabel - es la descripcion del label
+ * @param {int} rangoMinimo - es el valor para el rango minimo
+ * @param {int} rangoMaximo -es el valor para el rango maximo
+ * @returns {objet} retorna un objeto de tipo {div:HtmlDivElement, input:HtmlInputElement }
+ */
+
+function crearInputRango(descripcionLabel, rangoMinimo, rangoMaximo) {
+
+    let div = crearDiv(CLASES_DIV_FORMULARIO);
+    let label = document.createElement("label");
+    label.textContent = descripcionLabel;
+    CLASES_LABEL_TEXTO.forEach(clase => label.classList.add(clase));
+
+    let input = document.createElement("input");
+    input.type = "range";
+    input.setAttribute("min", String(rangoMinimo));
+    input.setAttribute("max", String(rangoMaximo));
+
+    CLASES_INPUT_RANGO.forEach(clase => input.classList.add(clase));
+    div.append(label, input);
+
+    return { div: div, input: input };
+
+}
+
+/**
  * funcion para crear un link
  * @param {string} href - es el sitio al cual dirigira el link
  * @param {string} descripcion - es la descripcion que aparecera en el html
@@ -282,6 +353,45 @@ function crearLink(href, descripcion, clases) {
     div.append(link);
 
     return { div: div, link: link };
+}
+
+function crearImagen(src, alt = "", caption = "", width = 0, height = 0, clasesDiv = [], clasesImagen = []) {
+
+    return new Promise((resolve, reject) => {
+
+        let divImagen = crearDiv(clasesDiv);
+        let imagen = document.createElement("img");
+        let figure = document.createElement("figure");
+        let figcaption = document.createElement("figcaption");
+        imagen.id = generarTextoAleatorio(longitud);
+
+        clasesImagen.forEach(clase => imagen.classList.add(clase));
+
+        imagen.onload = null;
+        imagen.onerror = null;
+        imagen.src = src;
+
+        imagen.onload = function () {
+            imagen.alt = alt
+            imagen.loading = "lazy";
+            imagen.decoding = "async";
+            figcaption.textContent = caption;
+            if (width !== 0) imagen.width = width;
+            if (height !== 0) imagen.height = height;
+            figure.append(imagen, figcaption);
+            divImagen.append(figure);
+            resolve({ div: divImagen, img: imagen, figure: figure });
+        }
+
+        imagen.onerror = function () {
+            reject(new Error("Error al cargar la imagen"));
+        }
+
+
+
+    });
+
+
 }
 
 /**
@@ -320,10 +430,10 @@ function agregarTemaMenu(hrefId, descripcion) {
             let indiceBusqueda = `#${temas[indice + 1].id}`;
             let elemento = document.querySelector(`a[href="${indiceBusqueda}"]`);
 
-            if (elemento){
+            if (elemento) {
                 liPadre = elemento.closest('li');
                 liPadre.before(li);
-            }else{
+            } else {
                 ulTemas.append(li)
             }
 
@@ -358,6 +468,11 @@ function eliminarTemaMenu(descripcion) {
 
 }
 
+
+/**
+ * funcion que sirve para limpiar todos los menus que se encuentra en ul#ulTemas y luego segun el orden de los titulos en contenedor 
+ * agregar la lista de temas
+ */
 function crearMenusPorReordenamiento() {
 
     let ul = document.getElementById("ulTemas");
@@ -370,11 +485,10 @@ function crearMenusPorReordenamiento() {
 
         let temas = document.getElementById('contenedor').querySelectorAll('div[data-tema="tema"].parrafo >h1, div[data-tema="tema"].parrafo >h2, div[data-tema="tema"].parrafo >h3, div[data-tema="tema"].parrafo >h4');
 
-        temas.forEach(tema =>{
+        temas.forEach(tema => {
             let id = tema.id;
             let descripcion = tema.textContent;
 
-            console.log("VAMOS A VER QUE LE ENVIO:", id, descripcion);
             agregarTemaMenu(`#${id}`, descripcion);
         });
 
@@ -535,7 +649,7 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
     let clasesBtn = ["btn", "btn-link", "dropdown-item", "sidebar-link"];
 
     //CLASES_BTN_ACTUALIZAR_HTML_EDICION
-    let buttonActualizar = crearButton("Actualizar", clasesBtn, [], CLASES_ICONO_BOTON_ACTUALIZAR);
+    let buttonActualizar = crearButton("Editar", clasesBtn, [], CLASES_ICONO_BOTON_ACTUALIZAR);
     buttonActualizar.onclick = () => RegresarAEdicionElemento(divFormularioEdicion, divActual);
 
     let buttonEliminar = crearButton("Eliminar", clasesBtn, [], CLASES_ICONO_BOTON_ELIMINAR);
@@ -629,7 +743,7 @@ function crearTextoHtml(etiqueta, texto, palabrasImportantes, divCrearParrafo, e
     if (etiqueta == "p" && palabrasImportantes.trim().trimStart().trimEnd() != "") {
         let arregloPalabras = palabrasImportantes.split(",");
         arregloPalabras.forEach(p => {
-            texto = texto.replaceAll(p, `<b>${p}</b>`);
+            texto = texto.replaceAll(p, `<strong>${p}</strong>`);
         });
     }
     parrafo.innerHTML = texto;
@@ -749,46 +863,47 @@ function crearTablaHtml(headers, tabla, divFormularioEdicion, tipoTabla, tituloT
  * funcion para crear una imagen html basado en lo registrado en el formulario de edicion
  * @param {HtmlDivElement} divFormluarioEdicion - es el elemento donde se encuentra el input para crear el html
  * @param {string} src - es el source o direccion http de donde se encuentra la imagen a mostrar 
+ * @param {string} caption - es la descripcion de la imagen
+ * @param {string} alt - es el texto del texto alternativo de la imagen si no llegase a cargar
 */
 
-function crearImagenHtml(divFormularioEdicion, src, alt) {
+async function crearImagenHtml(divFormularioEdicion, src, alt, caption = "", width = 0, height = 0) {
 
-    let informacion = {
-        "tipoCreacion": TIPOS.imagen,
-        "src": src,
-        "alt": alt ?? ""
+    try {
+        let informacion = {
+            "tipoCreacion": TIPOS.imagen,
+            "src": src,
+            "alt": alt ?? "",
+            "caption": caption ?? "",
+            "width": width ?? 0,
+            "height": height ?? 0
+        }
+
+        let atributoInformacion = { ...atributo };
+        atributoInformacion.atributo = "data-informacion";
+        atributoInformacion.valor = JSON.stringify(informacion);
+
+        let atributoNombre = { ...atributo };
+        atributoNombre.atributo = "data-nombre";
+        atributoNombre.valor = "imagen"
+
+        let atributos = [atributoInformacion, atributoNombre];
+
+        console.log(atributos);
+        let div = crearDiv([], atributos)
+
+        let { img: imagen, figure: figure } = await crearImagen(src, alt, caption, width, height, [], CLASES_IMAGENES);
+
+        div.append(figure);
+        botonesEdicionHtml(divFormularioEdicion, div);
+
+        divFormularioEdicion.before(div);
+        divFormularioEdicion.remove();
+
+    } catch (ex) {
+        console.log(ex);
     }
 
-    let atributoInformacion = { ...atributo };
-    atributoInformacion.atributo = "data-informacion";
-    atributoInformacion.valor = JSON.stringify(informacion);
-
-    let atributoNombre = { ...atributo };
-    atributoNombre.atributo = "data-nombre";
-    atributoNombre.valor = "imagen"
-
-    let atributos = [atributoInformacion, atributoNombre];
-
-    console.log(atributos);
-    let div = crearDiv([], atributos)
-
-    let imagen = document.createElement("img");
-    imagen.src = src;
-    imagen.id = generarTextoAleatorio(longitud);
-    imagen.alt = alt
-    imagen.loading = "lazy";
-
-    let figure = document.createElement("figure");
-    let figcaption = document.createElement("figcaption");
-    figcaption.textContent = alt;
-
-    figure.append(imagen, figcaption);
-
-    div.append(figure);
-    botonesEdicionHtml(divFormularioEdicion, div);
-
-    divFormularioEdicion.before(div);
-    divFormularioEdicion.remove();
 }
 
 
@@ -874,14 +989,14 @@ function crearListaHtml(divFormularioEdicion, tipoLista, tituloLista = "") {
  * palabras que quiera remarcar, esto se separa por comas
  * @param {object} informacion - objeto que se recibe al momento de cargar un proyecto, si recibe informacion, carga el texto tal cual fue almacenado y su modo de edicion.
 */
-function agregarParrafo(informacion = null) {
+function agregarTexto(informacion = null) {
 
 
     let contenedor = document.getElementById("contenedor");
     let opcionesMenu = document.querySelector("#opcionesMenu");
 
     //se crea div general que es el contenedor del elemento en general
-    let divCrearParrafo = document.createElement("div");
+    let divCrearParrafo = crearDiv(CLASES_DIV_BORDE);
     divCrearParrafo.classList.add("CreacionParrafo");
 
     //estos dos divs creo que son medio innecesarios, pero los uso para contener a el input y select
@@ -975,7 +1090,7 @@ function agregarLista(informacion = null) {
     let opcionesMenu = document.getElementById("opcionesMenu");
 
     //creo un divLista, este va a contener todos los elementos 
-    let divLista = document.createElement("div");
+    let divLista = crearDiv(CLASES_DIV_BORDE);
 
     divLista.id = `lista-${generarTextoAleatorio(longitud)}`;
 
@@ -1088,7 +1203,7 @@ function agregarTablaVariables(informacion = null) {
 
     let { div: divTituloTabla, input: inputTitulo } = crearInputText("input", "Ingresa el titulo (opcional)", "Titulo Tabla");
 
-    let div = document.createElement("div");
+    let div = crearDiv(CLASES_DIV_BORDE);
     div.classList.add("tablas");
 
     let headers = [
@@ -1162,7 +1277,7 @@ function agregarTablaDinamica(informacion = null) {
 
     let headers = [];
 
-    let div = crearDiv();
+    let div = crearDiv(CLASES_DIV_BORDE);
 
 
     let buttonAgregar = crearButton("Agregar nombre columna", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA);
@@ -1226,7 +1341,7 @@ function agregarTablaDinamica(informacion = null) {
 */
 function agregarTablaDinamicaInformacion(divFormularioEdicion, headers, informacion = null) {
 
-    let div = document.createElement("div");
+    let div = crearDiv(CLASES_DIV_BORDE)
     let tabla = crearTablaHeader(headers);
 
     let listaInputs = [];
@@ -1288,6 +1403,8 @@ function agregarTablaDinamicaInformacion(divFormularioEdicion, headers, informac
 
 }
 
+
+
 /**
  * funcion que sirve para agregar una imagen dado una url
  * @param {object} informacion - contiene la informacion de un json, eso se utiliza unicamente si se esta cargando un proyecto
@@ -1298,23 +1415,115 @@ function agregarImagen(informacion = null) {
     atributoDiv.atributo = "data-tipo";
     atributoDiv.valor = "Imagen";
 
-    let divFormularioEdicion = crearDiv([], [atributoDiv]);
+    let x = 0;
+    let y = 0;
+    let inputRangoX = undefined;
+    let divRangoX = undefined;
+    let imagen = undefined;
+    let divPrevisualizacion = crearDiv(CLASES_DIV_BORDE);
 
-    let buttonCrear = crearButton("Crear Imagen");
+    let divFormularioEdicion = crearDiv(CLASES_DIV_BORDE, [atributoDiv]);
     let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
-    let buttonCancelar = crearButton("Cancelar", [], [atributoEliminar]);
+
+    let divGrupo = crearDiv(CLASES_DIV_BOTONES_GRUPO);
+    let buttonCrear = crearButton("Crear Imagen", CLASES_BOTON_PERSONALIZADO, CLASES_ICONO_BOTON_CREAR);
+    let buttonCancelar = crearButton("Eliminar", CLASES_BOTON_PERSONALIZADO, [atributoEliminar], CLASES_ICONO_BOTON_ELIMINAR);
+    let buttonCargar = crearButton("Previsualizar Imagen", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_AGREGAR);
+
 
     let { div: divInputImagen, input: inputImagen } = crearInputText("input", "Ingresa la url de la imagen", "url imagen");
     let { div: divInputAlt, input: inputAlt } = crearInputText("input", "Ingresa el texto alterno de la imagen", "alt imagen");
+    let { div: divinputCaption, input: inputCaption } = crearInputText("input", "Ingresa la descripcion de la imagen", "descripcion imagen");
+
+    //vamos a agregar los controles para manejar el ancho y alto
+    buttonCargar.onclick = async function () {
+
+
+        divPrevisualizacion.querySelectorAll("img, div").forEach(im => im.remove());
+        try {
+           
+            let src = inputImagen.value;
+            ({ div: divPrevisualizacion, img: imagen, figure: figure } = await crearImagen(src, "", "", 0, 0, CLASES_DIV_BORDE, CLASES_IMAGENES));
+            x = imagen.width;
+            y = imagen.height;
+            imagen.classList.add("imgEdicion");
+
+            ({ div: divRangoX, input: inputRangoX } = crearInputRango("Define el tamaño de la imagen", Math.floor(x / 3), x));
+            if (!informacion) {
+                imagen.width = Math.floor(imagen.width / 3);
+            } else {
+                imagen.width = informacion.width ?? x;
+                inputRangoX.value = informacion.width ?? x;
+
+            }
+            inputRangoX.onchange = function () {
+                imagen.width = inputRangoX.value;
+            }
+
+            CLASES_DIV_BORDE.forEach(clase => divRangoX.classList.add(clase));
+            divPrevisualizacion.append(divRangoX);
+
+            divGrupo.before(divPrevisualizacion);
+
+            /*
+            imagen.onload = null;
+            imagen.onerror = null;
+
+            
+            
+
+
+            imagen.onload = function () {
+                
+
+                x = imagen.width;
+                y = imagen.height;
+                ({ div: divRangoX, input: inputRangoX } = crearInputRango("Define el tamaño de la imagen", Math.floor(x / 3), x));
+
+                if (!informacion) {
+                    imagen.width = Math.floor(imagen.width / 3);
+                } else {
+                    imagen.width = informacion.width ?? x;
+                    inputRangoX.value = informacion.width ?? x;
+
+                }
+
+                
+
+
+
+                inputRangoX.onchange = function () {
+                    imagen.width = inputRangoX.value;
+                }
+
+                divGrupo.before(divPrevisualizacion);
+            }
+
+            imagen.onerror = function () {
+                alert("Imagen no valida");
+                imagen = undefined;
+            }
+                */
+
+
+        } catch (ex) {
+            alert(ex)
+        }
+
+    }
 
     buttonCrear.onclick = function () {
 
-        crearImagenHtml(divFormularioEdicion, inputImagen.value, inputAlt.value);
+        x = imagen.width;
+        y = imagen.height;
+        crearImagenHtml(divFormularioEdicion, inputImagen.value, inputAlt.value, inputCaption.value, x, y);
     }
 
     buttonCancelar.onclick = () => eliminarDiv(divFormularioEdicion);
 
-    divFormularioEdicion.append(divInputImagen, divInputAlt, buttonCrear, buttonCancelar);
+    divGrupo.append(buttonCargar, buttonCrear, buttonCancelar);
+
+    divFormularioEdicion.append(divInputImagen, divInputAlt, divinputCaption, divGrupo);
     let opcionesMenu = document.getElementById("opcionesMenu");
     opcionesMenu.before(divFormularioEdicion);
 
@@ -1323,7 +1532,12 @@ function agregarImagen(informacion = null) {
     if (informacion) {
         inputImagen.value = informacion.src;
         inputAlt.value = informacion.alt ?? "";
-        crearImagenHtml(divFormularioEdicion, informacion.src, inputAlt.value);
+        inputCaption.value = informacion.caption ?? "";
+        x = informacion.width;
+        y = informacion.height;
+
+        buttonCargar.click();
+        crearImagenHtml(divFormularioEdicion, informacion.src, inputAlt.value, inputCaption.value);
     }
 
 }
@@ -1366,7 +1580,7 @@ function crearJson() {
 
     let contenedor = document.getElementById("contenedor");
 
-    let divs = contenedor.querySelectorAll("div:not(#opcionesMenu)");
+    let divs = contenedor.querySelectorAll("div:not(#opcionesMenu):not(.divEdicion)");
 
     divs.forEach(div => {
         documentacion.elementos.push(JSON.parse(div.dataset.informacion));
@@ -1401,7 +1615,7 @@ function recuperarDocumentacion(json) {
 
         switch (informacion.tipoCreacion) {
             case TIPOS.texto:
-                agregarParrafo(informacion);
+                agregarTexto(informacion);
                 break;
             case TIPOS.lista:
                 agregarLista(informacion);
@@ -1586,7 +1800,7 @@ window.onload = function () {
     let clasesLi = ['sidebar-item'];
 
 
-    let funcionTexto = new FuncionJs(clasesLi, clasesBtn, [dataBsToogle, dataBsTrigger, { ...dataBsContent, "valor": "funcion para agregar un texto en el documento a crear" }], [...clasesIcono, 'bi-card-text'], "Agregar Texto", agregarParrafo);
+    let funcionTexto = new FuncionJs(clasesLi, clasesBtn, [dataBsToogle, dataBsTrigger, { ...dataBsContent, "valor": "funcion para agregar un texto en el documento a crear" }], [...clasesIcono, 'bi-card-text'], "Agregar Texto", agregarTexto);
     let funcionLista = new FuncionJs(clasesLi, clasesBtn, [dataBsToogle, dataBsTrigger, { ...dataBsContent, "valor": "funcion para agregar una lista" }], [...clasesIcono, 'bi-list-task'], "Agregar Lista", agregarLista);
     let funcionTabla = new FuncionJs(clasesLi, clasesBtn, [dataBsToogle, dataBsTrigger, { ...dataBsContent, "valor": "funcion para agregar una tabla" }], [...clasesIcono, 'bi-table'], "Agregar Tabla", agregarTablaDinamica);
     let funcionTablaVariables = new FuncionJs(clasesLi, clasesBtn, [dataBsToogle, dataBsTrigger, { ...dataBsContent, "valor": "funcion para agregar una tabla de variables" }], [...clasesIcono, 'bi-border-all'], "Agregar Tabla Variables", agregarTablaVariables);

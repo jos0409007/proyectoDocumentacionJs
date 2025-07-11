@@ -219,3 +219,17 @@ a.sidebar-link-menu{
     word-wrap: break-word;
     /*overflow-wrap: break-word;*/
 }
+
+img.imgEdicion {
+    /* Define la transición para la propiedad 'width' */
+    transition: width 0.3s ease-in-out, 
+                /* Y también para la propiedad 'height', separadas por una coma */
+                height 0.3s ease-in-out; 
+
+    /* Propiedades adicionales recomendadas para imágenes responsivas */
+    max-width: 100%; /* Asegura que la imagen no exceda el ancho de su contenedor */
+    height: auto;    /* Crucial para mantener la proporción de la imagen 
+                        cuando solo se ajusta el width o el height, 
+                        o cuando se deja que el navegador calcule uno de ellos. */
+    display: block;  /* A menudo útil para eliminar el espacio adicional debajo de las imágenes */
+}
