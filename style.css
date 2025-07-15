@@ -190,11 +190,22 @@ button.sidebar-link-group:hover {
 :root {
     --sidebar-link-hover-bg :rgb(14, 34, 62, .075);
     --sidebar-link-hover-button: rgb(14, 34, 62, .090);
+       --bs-info-text-emphasis: #055160;
+         --bs-info-bg-subtle: #cff4fc;
+             --bd-callout-link: 10,88,202;
+             --bd-callout-code-color: #ab296a;
+    --bd-pre-bg: var(--bs-tertiary-bg)
+
 }
 
 html[data-bs-theme="dark"]{
     --sidebar-link-hover-bg :rgb(255, 255, 255, .075);
     --sidebar-link-hover-button: rgb(255, 255, 255, .090);
+        --bs-info-bg-subtle: #032830;
+            --bs-info-text-emphasis: #6edff6;
+                --bd-callout-link: 110,168,254;
+                    --bd-callout-code-color: #e685b5;
+    --bd-pre-bg: #1b1f22
 }
 
 #temas h6{
@@ -232,4 +243,52 @@ img.imgEdicion {
                         cuando solo se ajusta el width o el height, 
                         o cuando se deja que el navegador calcule uno de ellos. */
     display: block;  /* A menudo útil para eliminar el espacio adicional debajo de las imágenes */
+}
+
+
+
+
+.bd-callout {
+    --bs-link-color-rgb: var(--bd-callout-link);
+    --bs-code-color: var(--bd-callout-code-color);
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    color: var(--bd-callout-color, inherit);
+    background-color: var(--bd-callout-bg, var(--bs-gray-100));
+    border-left: 0.25rem solid var(--bd-callout-border, var(--bs-gray-300))
+}
+
+.bd-callout h4 {
+    margin-bottom: .25rem
+}
+
+.bd-callout>:last-child {
+    margin-bottom: 0
+}
+
+.bd-callout+.bd-callout {
+    margin-top: -.25rem
+}
+
+.bd-callout .highlight {
+    background-color: rgba(0,0,0,0.05)
+}
+
+.bd-callout-info {
+    --bd-callout-color: var(--bs-info-text-emphasis);
+    --bd-callout-bg: var(--bs-info-bg-subtle);
+    --bd-callout-border: var(--bs-info-border-subtle)
+}
+
+.bd-callout-warning {
+    --bd-callout-color: var(--bs-warning-text-emphasis);
+    --bd-callout-bg: var(--bs-warning-bg-subtle);
+    --bd-callout-border: var(--bs-warning-border-subtle)
+}
+
+.bd-callout-danger {
+    --bd-callout-color: var(--bs-danger-text-emphasis);
+    --bd-callout-bg: var(--bs-danger-bg-subtle);
+    --bd-callout-border: var(--bs-danger-border-subtle)
 }

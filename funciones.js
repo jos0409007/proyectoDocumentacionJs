@@ -1013,7 +1013,6 @@ function agregarTexto(informacion = null) {
         "Palbras a resaltar", false);
 
     let { div: divFormGroupSelect, select: selectTexto } = crearInputSelect(OPCIONES_TEXTO, "Tipo de texto a insertar");
-
     let { div: divCheck, input: inputCheck } = crearInputCheck("Tema");
 
     //agrego la funcionalidad onchange en el select texto para que cuando sea un parrafo el que voy a agregar agrege la capacidad de
@@ -1443,7 +1442,7 @@ function agregarImagen(informacion = null) {
         try {
            
             let src = inputImagen.value;
-            ({ div: divPrevisualizacion, img: imagen, figure: figure } = await crearImagen(src, "", "", 0, 0, CLASES_DIV_BORDE, CLASES_IMAGENES));
+            ({ div: divPrevisualizacion, img: imagen } = await crearImagen(src, "", "", 0, 0, CLASES_DIV_BORDE, CLASES_IMAGENES));
             x = imagen.width;
             y = imagen.height;
             imagen.classList.add("imgEdicion");
@@ -1464,46 +1463,6 @@ function agregarImagen(informacion = null) {
             divPrevisualizacion.append(divRangoX);
 
             divGrupo.before(divPrevisualizacion);
-
-            /*
-            imagen.onload = null;
-            imagen.onerror = null;
-
-            
-            
-
-
-            imagen.onload = function () {
-                
-
-                x = imagen.width;
-                y = imagen.height;
-                ({ div: divRangoX, input: inputRangoX } = crearInputRango("Define el tamaño de la imagen", Math.floor(x / 3), x));
-
-                if (!informacion) {
-                    imagen.width = Math.floor(imagen.width / 3);
-                } else {
-                    imagen.width = informacion.width ?? x;
-                    inputRangoX.value = informacion.width ?? x;
-
-                }
-
-                
-
-
-
-                inputRangoX.onchange = function () {
-                    imagen.width = inputRangoX.value;
-                }
-
-                divGrupo.before(divPrevisualizacion);
-            }
-
-            imagen.onerror = function () {
-                alert("Imagen no valida");
-                imagen = undefined;
-            }
-                */
 
 
         } catch (ex) {
