@@ -14,6 +14,14 @@ const TIPOS = {
     "codigo": "codigo"
 }
 
+const LENGUAJES_PROGRAMACION = [
+    { "texto": "json", "value": "language-json" },
+    { "texto": "javaScript", "value": "language-javascript" },
+    { "texto": "C#", "value": "language-csharp" },
+    { "texto": "python", "value": "language-python" },
+    { "texto": "SQL", "value": "language-sql" }
+]
+
 const OPCIONES_TEXTO = [
     { "value": "h1", "texto": "H1" },
     { "value": "h2", "texto": "H2" },
@@ -43,6 +51,12 @@ const CLASES_INPUT_CHECK = ["form-check-input"];
 const CLASES_LABEL_CHECK = ["form-check-label"];
 const CLASES_LINK = ["link-body-emphasis", "link-offset-2", "link-underline-pacity-0", "link-underline-opacity-75-hover"]
 const CLASES_DIV_BORDE = ["border", "p-2", "mb-2", "border-opacity-75"];
+const CLASES_DIV_MODAL_CONTENEDOR = ["modal", "fade"];
+const CLASES_DIV_MODAL_DIALOG = ["modal-dialog"];
+const CLASES_DIV_MODAL_CONTENT = ["modal-content"];
+const CLASES_DIV_MODAL_HEADER = ["modal-header"];
+const CLASES_DIV_MODAL_BODY = ["modal-body"];
+const CLASES_DIV_MODAL_FOOTER = ["modal-footer"];
 
 
 /**
@@ -579,24 +593,41 @@ function editarPosiciones(divActual, button) {
     //console.log(button);
 
     let contenedor = document.getElementById("contenedor");
+
+    //obtengo todos los divs que son de elementos creados, omito el div general de opcionesMenu y 
+    //todos los divs con clase divEdicion, porque esta clase se agrega a cada elemento para poder regresar a su modo edicion
+    //al agregar esa opcion, tomaba en cuenta los divs que contienen los botones para regresar al modo edicion de cada elemento creado
+    //por lo que los exclui tambien
+
     let divs = contenedor.querySelectorAll("div:not(#opcionesMenu):not(.divEdicion)");
 
-    divActual.querySelectorAll("div[data-modal='modal']");
-    //if (divBusqueda.length >0) console.log("ENCONTRE",divBusqueda);
+    divActual.querySelectorAll("div[data-modal='modal']"); //creo que solo era una prueba para verificar lo que hacia
 
     let divEdicion = crearDiv();
-    divEdicion.setAttribute("data-modal", "modal");
+
+    let divDialog = crearDiv(CLASES_DIV_MODAL_DIALOG);
+    let divContent = crearDiv(CLASES_DIV_MODAL_CONTENT);
+    let divHeader = crearDiv(CLASES_DIV_MODAL_HEADER);
+    let divBody = crearDiv(CLASES_DIV_MODAL_BODY);
+    let divFooter = crearDiv(CLASES_DIV_MODAL_FOOTER);
+
+    //creo el titulo y luego lo agrego a su div correspondiente
+    let titulo = document.createElement("h4");
+    titulo.textContent = "Edicion de elementos";
+
+    divHeader.append(titulo);
+
+    divEdicion.setAttribute("data-modal", "modal"); 
     let tablaElementos = crearTablaHeader(["Tipo", "Id", "Accion"]);
-
-
-    //let ol = document.createElement("ol");
 
     button.setAttribute("popovertarget", divEdicion.id);
     //button.setAttribute("popovertargetaction", "show");
 
-    divEdicion.popover = 'manual';
+    divEdicion.popover = 'manual'; //asi no se puede cerrar el modal haciendo click fuera del panel
 
 
+    //recorro todos los divs que se han creado. ya que puedo agregar esto de manera dinamica, entonces siempre obtendre todos los que
+    //encuentre al momento de hacer click
     divs.forEach((dv) => {
 
         //let li = document.createElement("li");
@@ -629,12 +660,20 @@ function editarPosiciones(divActual, button) {
         tablaElementos.append(tr);
         //ol.append(li);
     });
-    let buttonCancelar = crearButton("Cancelar");
+
+    divBody.append(tablaElementos);
+
+
+    let buttonCancelar = crearButton("Cancelar", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CANCELAR);
     buttonCancelar.onclick = () => eliminarDiv(divEdicion);
-    let titulo = document.createElement("h3");
-    titulo.textContent = "Edicion de elementos"
+
+    divFooter.append(buttonCancelar);
+
+    divContent.append(divHeader, divBody, divFooter);
+    divDialog.append(divContent);
 
     divEdicion.append(titulo, tablaElementos, buttonCancelar);
+    //divEdicion.append(divDialog);
     divActual.append(divEdicion);
 }
 
@@ -915,11 +954,13 @@ async function crearImagenHtml(divFormularioEdicion, src, alt, caption = "", wid
  * @param {string} codigo - es el codigo que se va a mostrar en la documentacion
  * 
 */
-function crearCodigoHtml(divFormularioEdicion, codigo) {
+function crearCodigoHtml(divFormularioEdicion, codigo, tipoCodigo = "", titulo="") {
 
     let informacion = {
         "tipoCreacion": TIPOS.codigo,
-        "codigo": codigo
+        "codigo": codigo,
+        "tipoCodigo": tipoCodigo,
+        "titulo":titulo
     }
 
     let div = crearDiv();
@@ -930,14 +971,20 @@ function crearCodigoHtml(divFormularioEdicion, codigo) {
     div.setAttribute("data-nombre", "codigo");
 
     let code = document.createElement("code");
+    if (tipoCodigo != "") code.classList.add(tipoCodigo);
     code.textContent = codigo;
+
+    let tituloPrueba = document.createElement("h6");
+    tituloPrueba.textContent = titulo;
     pre.append(code);
-    div.append(pre);
+    div.append(tituloPrueba,pre);
 
     botonesEdicionHtml(divFormularioEdicion, div);
 
     divFormularioEdicion.before(div);
     divFormularioEdicion.remove();
+    hljs.highlightElement(code);
+
 }
 
 function crearListaHtml(divFormularioEdicion, tipoLista, tituloLista = "") {
@@ -1440,7 +1487,7 @@ function agregarImagen(informacion = null) {
 
         divPrevisualizacion.querySelectorAll("img, div").forEach(im => im.remove());
         try {
-           
+
             let src = inputImagen.value;
             ({ div: divPrevisualizacion, img: imagen } = await crearImagen(src, "", "", 0, 0, CLASES_DIV_BORDE, CLASES_IMAGENES));
             x = imagen.width;
@@ -1503,30 +1550,35 @@ function agregarImagen(informacion = null) {
 
 function agregarCodigo(informacion = null) {
 
-    let divFormularioEdicion = document.createElement("div");
+    let divFormularioEdicion = crearDiv();
+    let { div: divSelect, select: selectLenguaje } = crearInputSelect(LENGUAJES_PROGRAMACION, "Selecciona el lenguaje");
     let { div: divCodigo, input: inputCodigo } = crearInputText("textarea", "Ingresa el codigo a documentar", "Codigo");
+    let { div: divTitulo, input: inputTitulo } = crearInputText("input", "Ingresa el titulo (opcional)", "Titulo");
 
-    let buttonCrear = crearButton("Agregar Código");
+    let buttonCrear = crearButton("Agregar Código", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CREAR);
 
     let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
-    let buttonCancelar = crearButton("Cancelar", [], [atributoEliminar]);
+    let buttonCancelar = crearButton("Eliminar", CLASES_BOTON_PERSONALIZADO, [atributoEliminar], CLASES_ICONO_BOTON_ELIMINAR);
     buttonCancelar.onclick = () => eliminarDiv(divFormularioEdicion);
 
     buttonCrear.onclick = function () {
 
-        crearCodigoHtml(divFormularioEdicion, inputCodigo.value);
+        crearCodigoHtml(divFormularioEdicion, inputCodigo.value, selectLenguaje.value, inputTitulo.value);
 
     }
 
-    divFormularioEdicion.append(divCodigo, buttonCrear, buttonCancelar);
+    divFormularioEdicion.append(divSelect, divTitulo, divCodigo, buttonCrear, buttonCancelar);
     let opcionesMenu = document.getElementById("opcionesMenu")
     opcionesMenu.before(divFormularioEdicion);
 
     divFormularioEdicion.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     if (informacion) {
-        inputCodigo = informacion.codigo;
-        crearCodigoHtml(divFormularioEdicion, informacion.codigo);
+        inputCodigo.value = informacion.codigo;
+        selectLenguaje.value = informacion.tipoCodigo ?? "";
+        inputTitulo = informacion.titulo ?? ""; 
+
+        crearCodigoHtml(divFormularioEdicion, informacion.codigo, informacion.tipoCodigo ?? "", informacion.titulo ?? "");
     }
 
 }

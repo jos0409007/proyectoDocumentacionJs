@@ -85,7 +85,7 @@ button.btn-link {
 
 #toogle-btn i {
     font-size: 1.5rem;
-   /* color: rgb(14, 34, 62);*/
+    /* color: rgb(14, 34, 62);*/
 }
 
 .sidebar-logo {
@@ -105,7 +105,7 @@ button.btn-link {
 #sidebar:not(.expand) a.sidebar-link span,
 #sidebar:not(.expand) button.sidebar-link span {
     display: none;
-}
+} 
 
 .sidebar-nav {
     padding: 1rem 0;
@@ -114,7 +114,7 @@ button.btn-link {
 
 a.sidebar-link {
     padding: .625rem 1.625rem;
-   /* color: rgb(14, 34, 62);*/
+    /* color: rgb(14, 34, 62);*/
     display: block;
     font-size: 0.9rem;
     white-space: nowrap;
@@ -126,24 +126,27 @@ a.sidebar-link {
 
 button.sidebar-link {
     padding: .625rem 1.625rem;
-   /* color: rgb(14, 34, 62);*/
+    /* color: rgb(14, 34, 62);*/
     font-size: 0.9rem;
     white-space: nowrap;
     border-left: 3px solid transparent;
     text-decoration: none;
     color: inherit;
     width: 100%;
-        /* ¡PROPIEDADES CLAVE PARA LA ALINEACIÓN INTERNA! */
-    display: flex;         /* Convierte el link/botón en un contenedor flex */
-    align-items: center;   /* Alinea los ítems (ícono y span) verticalmente al centro */
-    justify-content: flex-start; /* Alinea los ítems horizontalmente al inicio (izquierda) */
+    /* ¡PROPIEDADES CLAVE PARA LA ALINEACIÓN INTERNA! */
+    display: flex;
+    /* Convierte el link/botón en un contenedor flex */
+    align-items: center;
+    /* Alinea los ítems (ícono y span) verticalmente al centro */
+    justify-content: flex-start;
+    /* Alinea los ítems horizontalmente al inicio (izquierda) */
     /* Si quieres que estén espaciados, podrías usar justify-content: space-between; */
 
 }
 
 button.sidebar-link-group {
 
-   /* color: rgb(14, 34, 62);*/
+    /* color: rgb(14, 34, 62);*/
     font-size: 0.9rem;
     white-space: nowrap;
     text-decoration: none;
@@ -153,15 +156,19 @@ button.sidebar-link-group {
 }
 
 
-.sidebar-link i, .sidebar-link-group i {
+.sidebar-link i,
+.sidebar-link-group i {
     font-size: 1.1 rem;
     margin-right: .75rem;
 }
-.sidebar-link i span, .sidebar-link-group i span{
+
+.sidebar-link i span,
+.sidebar-link-group i span {
     padding: 0.5rem;
 }
 
-a.sidebar-link:hover, a.sidebar-link-menu:hover {
+a.sidebar-link:hover,
+a.sidebar-link-menu:hover {
     background-color: var(--sidebar-link-hover-bg);
 
 }
@@ -188,34 +195,33 @@ button.sidebar-link-group:hover {
 }
 
 :root {
-    --sidebar-link-hover-bg :rgb(14, 34, 62, .075);
+    --sidebar-link-hover-bg: rgb(14, 34, 62, .075);
     --sidebar-link-hover-button: rgb(14, 34, 62, .090);
-       --bs-info-text-emphasis: #055160;
-         --bs-info-bg-subtle: #cff4fc;
-             --bd-callout-link: 10,88,202;
-             --bd-callout-code-color: #ab296a;
+    --bs-info-text-emphasis: #055160;
+    --bs-info-bg-subtle: #cff4fc;
+    --bd-callout-link: 10, 88, 202;
+    --bd-callout-code-color: #ab296a;
     --bd-pre-bg: var(--bs-tertiary-bg)
-
 }
 
-html[data-bs-theme="dark"]{
-    --sidebar-link-hover-bg :rgb(255, 255, 255, .075);
+html[data-bs-theme="dark"] {
+    --sidebar-link-hover-bg: rgb(255, 255, 255, .075);
     --sidebar-link-hover-button: rgb(255, 255, 255, .090);
-        --bs-info-bg-subtle: #032830;
-            --bs-info-text-emphasis: #6edff6;
-                --bd-callout-link: 110,168,254;
-                    --bd-callout-code-color: #e685b5;
+    --bs-info-bg-subtle: #032830;
+    --bs-info-text-emphasis: #6edff6;
+    --bd-callout-link: 110, 168, 254;
+    --bd-callout-code-color: #e685b5;
     --bd-pre-bg: #1b1f22
 }
 
-#temas h6{
+#temas h6 {
     padding: 1rem 1.5rem;
 }
 
 
-a.sidebar-link-menu{
+a.sidebar-link-menu {
     padding: .625rem 1.625rem;
-   /* color: rgb(14, 34, 62);*/
+    /* color: rgb(14, 34, 62);*/
     display: block;
     font-size: 0.9rem;
     border-left: 3px solid transparent;
@@ -224,7 +230,7 @@ a.sidebar-link-menu{
 
 }
 
-.link-tema span{
+.link-tema span {
     width: 20%;
     font-size: smaller;
     word-wrap: break-word;
@@ -233,16 +239,19 @@ a.sidebar-link-menu{
 
 img.imgEdicion {
     /* Define la transición para la propiedad 'width' */
-    transition: width 0.3s ease-in-out, 
-                /* Y también para la propiedad 'height', separadas por una coma */
-                height 0.3s ease-in-out; 
+    transition: width 0.3s ease-in-out,
+        /* Y también para la propiedad 'height', separadas por una coma */
+        height 0.3s ease-in-out;
 
     /* Propiedades adicionales recomendadas para imágenes responsivas */
-    max-width: 100%; /* Asegura que la imagen no exceda el ancho de su contenedor */
-    height: auto;    /* Crucial para mantener la proporción de la imagen 
+    max-width: 100%;
+    /* Asegura que la imagen no exceda el ancho de su contenedor */
+    height: auto;
+    /* Crucial para mantener la proporción de la imagen 
                         cuando solo se ajusta el width o el height, 
                         o cuando se deja que el navegador calcule uno de ellos. */
-    display: block;  /* A menudo útil para eliminar el espacio adicional debajo de las imágenes */
+    display: block;
+    /* A menudo útil para eliminar el espacio adicional debajo de las imágenes */
 }
 
 
@@ -272,7 +281,7 @@ img.imgEdicion {
 }
 
 .bd-callout .highlight {
-    background-color: rgba(0,0,0,0.05)
+    background-color: rgba(0, 0, 0, 0.05)
 }
 
 .bd-callout-info {
