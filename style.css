@@ -31,7 +31,7 @@ body {
 .main {
     min-height: 90vh;
     max-height: 90vh;
-    width: 100%;
+    width: 90%;
     transition: all 0.35 ease-in-out;
     text-align: justify;
 
@@ -45,11 +45,15 @@ body {
 }
 
 #temas {
-    width: 15%;
+    width: 20%;
     overflow: hidden;
     transition: all 0.35 ease-in-out;
     text-align: justify;
     padding: 1rem;
+    min-height: 90vh;
+    max-height: 90vh;
+    transition: all 0.35 ease-in-out;
+    text-align: left;
 }
 
 #sidebar {
