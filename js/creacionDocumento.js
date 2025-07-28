@@ -1,7 +1,7 @@
-let rutaJsHihlight = 'highlight.min.js';
-let rutaBootstrapJs = 'bootstrap.min.js';
-let rutaBootstrapCss = 'bootstrap.css';
-let rutaDefaultCss = 'default.min.css';
+let rutaJsHihlight = 'js/highlight.min.js';
+let rutaBootstrapJs = 'js/bootstrap.min.js';
+let rutaBootstrapCss = 'css/bootstrap.css';
+let rutaDefaultCss = 'css/default.min.css';
 
 let cssEstablecido = `p {
             text-align: justify;
