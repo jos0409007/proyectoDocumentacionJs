@@ -606,26 +606,12 @@ function editarPosiciones(divActual, button) {
 
     let divEdicion = crearDiv();
 
-    let divDialog = crearDiv(CLASES_DIV_MODAL_DIALOG);
-    let divContent = crearDiv(CLASES_DIV_MODAL_CONTENT);
-    let divHeader = crearDiv(CLASES_DIV_MODAL_HEADER);
-    let divBody = crearDiv(CLASES_DIV_MODAL_BODY);
-    let divFooter = crearDiv(CLASES_DIV_MODAL_FOOTER);
-
-    //creo el titulo y luego lo agrego a su div correspondiente
-    let titulo = document.createElement("h4");
-    titulo.textContent = "Edicion de elementos";
-
-    divHeader.append(titulo);
-
-    divEdicion.setAttribute("data-modal", "modal"); 
-    let tablaElementos = crearTablaHeader(["Tipo", "Id", "Accion"]);
-
-    button.setAttribute("popovertarget", divEdicion.id);
     //button.setAttribute("popovertargetaction", "show");
 
     divEdicion.popover = 'manual'; //asi no se puede cerrar el modal haciendo click fuera del panel
-
+    let tablaElementos = crearTablaHeader(["Tipo", "Id", "Accion"]);
+    let modal = document.getElementById("modal-body");
+    let tituloModal = document.getElementById("tituloModal");
 
     //recorro todos los divs que se han creado. ya que puedo agregar esto de manera dinamica, entonces siempre obtendre todos los que
     //encuentre al momento de hacer click
@@ -638,7 +624,6 @@ function editarPosiciones(divActual, button) {
 
         //li.textContent = `${dv.dataset.nombre}-${dv.id}`;
 
-
         let buttonMover = crearButton("mover aqui")
         buttonMover.onclick = function () {
             let div = document.getElementById(id);
@@ -650,6 +635,10 @@ function editarPosiciones(divActual, button) {
 
             divEdicion.remove();
             crearMenusPorReordenamiento();
+
+            let modal = document.getElementById("cerrarModal");
+            modal.click();
+            divActual.focus();
         }
 
         let td = document.createElement("td");
@@ -662,22 +651,19 @@ function editarPosiciones(divActual, button) {
         //ol.append(li);
     });
 
-    divBody.append(tablaElementos);
-
-
     let buttonCancelar = crearButton("Cancelar", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CANCELAR);
     buttonCancelar.onclick = () => eliminarDiv(divEdicion);
+    tituloModal.textContent = "Edición de elementos";
 
-    divFooter.append(buttonCancelar);
+    //console.log("VAMOS A VER LOS MODALES", modal, tituloModal);
+    modal.innerHTML = "";
+    modal.append(tablaElementos);
 
-    divContent.append(divHeader, divBody, divFooter);
-    divDialog.append(divContent);
 
-    divEdicion.append(titulo, tablaElementos, buttonCancelar);
+    //divEdicion.append(titulo, tablaElementos, buttonCancelar);
     //divEdicion.append(divDialog);
-    divActual.append(divEdicion);
+    //divActual.append(divEdicion);
 }
-
 /**
  * funcion para crear los botones de edicion de las funciones que necesitan retornar a un estado anterior
  * @param {HtmlDivElement} divFormularioEdicion - es el div donde se tiene la informacion en formato edicion del html
