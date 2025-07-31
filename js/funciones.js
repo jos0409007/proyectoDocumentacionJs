@@ -230,6 +230,53 @@ function crearDiv(clases = [], atributos = []) {
 }
 
 /**
+ * 
+ * @param {HtmlDivElement} div recibe un elemento div que sera eliminado
+ */
+function eliminarDiv(div) {
+  div.remove();
+}
+
+/**
+ * Esta funcion lo que hace es retornar a un estado anterior entre los divs de edicion y los divs con el contenido previo a generar el html final
+ * Lo que hace es reemplazar el div con el divActualizar, ademas que agregara un boton de cancelar edicion.
+ * Como divActualizar por defecto es el div de edicion, estos tienen un boton con una propiedad data-tipo = "cancelar", esta se busca con el query selector, si lo encuentra le coloca el boton de cancelar edicion, para evitar cualquier cambio que este realizando
+ * cabe mencionar que ese boton solo se agrega la primera vez que quiera editar el elemento
+ * 
+ * @param {HtmlDivElement} divActualizar es el div al cual se regresara
+ * @param {HtmlDivElement} div es el div por el cual se reemplazara divActualizar
+ * @param {HTMLButtonElement} agregarBtnCancelar es un boton que se utiliza para cancelar la edicion, por defecto este se agregara
+ */
+function RegresarAEdicionElemento(divActualizar, div, agregarBtnCancelar = true) {
+
+  if (agregarBtnCancelar) {
+
+    let busqueda = divActualizar.querySelector('button[data-tipo="cancelar"]');
+    if (!busqueda) {
+      let button = divActualizar.querySelector('button[data-tipo="eliminar"]');
+
+      let buttonCancelar = crearButton("Cancelar Cambios", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CANCELAR);
+      buttonCancelar.setAttribute("data-tipo", "cancelar");
+
+      buttonCancelar.onclick = function () {
+        RegresarAEdicionElemento(div, divActualizar, false);
+      }
+      button.before(buttonCancelar);
+    }
+    else {
+      busqueda.onclick = () => RegresarAEdicionElemento(div, divActualizar, false);
+    }
+
+  }
+
+  div.before(divActualizar);
+  eliminarDiv(div)
+
+}
+
+
+
+/**
  * funcion que crea un boton.
  * @param {string} textContent, descripcion que aparecera en el boton creado
  * @param {list[string]} clases - son la lista de clases que se le agregaran al boton, por defecto esta vacio
@@ -620,6 +667,7 @@ function editarPosiciones(divActual, button) {
 
   divEdicion.popover = 'manual'; //asi no se puede cerrar el modal haciendo click fuera del panel
   let tablaElementos = crearTablaHeader(["Tipo", "Id", "Accion"]);
+
   let modal = document.getElementById("modal-body");
   let tituloModal = document.getElementById("tituloModal");
 
@@ -649,6 +697,7 @@ function editarPosiciones(divActual, button) {
       let modal = document.getElementById("cerrarModal");
       modal.click();
       divActual.focus();
+      modal.innerHTML = "";
     }
 
     let td = document.createElement("td");
@@ -684,6 +733,14 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
 
   let clasesBtn = ["btn", "btn-link", "dropdown-item", "sidebar-link"];
 
+  let dataToggle = {...atributo};
+  dataToggle.atributo = "data-bs-toggle";
+  dataToggle.valor = "modal";
+
+  let dataTarget = {...atributo}
+  dataTarget.atributo = "data-bs-target";
+  dataTarget.valor = "#staticBackdrop";
+
   //CLASES_BTN_ACTUALIZAR_HTML_EDICION
   let buttonActualizar = crearButton("Editar", clasesBtn, [], CLASES_ICONO_BOTON_ACTUALIZAR);
   buttonActualizar.onclick = () => RegresarAEdicionElemento(divFormularioEdicion, divActual);
@@ -696,7 +753,7 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
 
   }
 
-  let buttonPosicion = crearButton("Mover Posicion", clasesBtn, [], CLASES_ICONO_BOTON_MOVER);
+  let buttonPosicion = crearButton("Mover Posicion", clasesBtn, [dataToggle, dataTarget], CLASES_ICONO_BOTON_MOVER);
   buttonPosicion.addEventListener("click", function () {
 
     editarPosiciones(divActual, this);
@@ -827,38 +884,6 @@ function crearTextoHtml(informacion, divCrearParrafo) {
 
 }
 
-
-function eliminarDiv(div) {
-  div.remove();
-}
-
-
-function RegresarAEdicionElemento(divActualizar, div, agregarBtnCancelar = true) {
-
-  if (agregarBtnCancelar) {
-
-    let busqueda = divActualizar.querySelector('button[data-tipo="cancelar"]');
-    if (!busqueda) {
-      let button = divActualizar.querySelector('button[data-tipo="eliminar"]');
-
-      let buttonCancelar = crearButton("Cancelar Cambios", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CANCELAR);
-      buttonCancelar.setAttribute("data-tipo", "cancelar");
-
-      buttonCancelar.onclick = function () {
-        RegresarAEdicionElemento(div, divActualizar, false);
-      }
-      button.before(buttonCancelar);
-    }
-    else {
-      busqueda.onclick = () => RegresarAEdicionElemento(div, divActualizar, false);
-    }
-
-  }
-
-  div.before(divActualizar);
-  eliminarDiv(div)
-
-}
 
 /**
  * funcion que crea el html final de la tabla
