@@ -182,21 +182,43 @@ async function downloadContent(url) {
 
 
 
-function crearTextoHtmlDocumento(informacion) {
+function crearTextoHtmlDocumento(informacion, divFormatoEdicion = undefined) {
 
-    let div = crearDiv();
-    let parrafo = document.createElement(informacion.etiqueta);
-    parrafo.id = generarTextoAleatorio(longitud);
-    //parrafo.className = "parrafo";
+    let div = divFormatoEdicion ?? crearDiv();
 
-    if (informacion.etiqueta == "p" && informacion.palabrasImportantes.trim().trimStart().trimEnd() != "") {
-        let arregloPalabras = informacion.palabrasImportantes.split(",");
-        arregloPalabras.forEach(p => {
-            informacion.texto = informacion.texto.replaceAll(p, `<strong>${p}</strong>`);
+    let id = generarTextoAleatorio(longitud);
+
+    if (informacion.etiqueta == "p") {
+
+        if (informacion.palabrasImportantes.trim().trimStart().trimEnd() != "") {
+            let arregloPalabras = informacion.palabrasImportantes.split(",");
+            arregloPalabras.forEach(p => {
+                informacion.texto = informacion.texto.replaceAll(p, `<strong>${p}</strong>`);
+            });
+        }
+
+        if (informacion.observaciones) {
+            let clases = informacion.tipoObservacion == "advertencia" ?
+                CLASES_TEXTO_ADVERTENCIA : informacion.tipoObservacion == "informacion" ?
+                    CLASES_TEXTO_INFORMACION : CLASES_TEXTO_PELIGRO;
+
+            clases.forEach(clase => div.classList.add(clase));
+        }
+
+        let listaTextos = informacion.texto.split("\n");
+        listaTextos.forEach(t => {
+            let textoHtml = document.createElement(informacion.etiqueta);
+            textoHtml.innerHTML = t;
+            div.append(textoHtml);
         });
+
+    } else {
+
+        let parrafo = document.createElement(informacion.etiqueta);
+        parrafo.id = id
+        parrafo.innerHTML = informacion.texto;
+        div.append(parrafo);
     }
-    parrafo.innerHTML = informacion.texto;
-    div.append(parrafo);
 
     return { div: div, id: parrafo.id };
 }
@@ -996,7 +1018,7 @@ async function crearDocumentoHtml(json = undefined) {
         switch (informacion.tipoCreacion) {
             case TIPOS.texto:
 
-                ({ div: div, id: id } = crearTextoHtmlDocumento(informacion));
+                ({ div: div, id: id } = generarContenidoTextoHTML(informacion));
                 if (informacion.esTitulo == true) {
                     let a = document.createElement("a");
                     a.classList.add("nav-link");
@@ -1051,8 +1073,6 @@ async function crearDocumentoHtml(json = undefined) {
 
     const serializer = new XMLSerializer();
     const htmlContentString = `<!DOCTYPE html>\n` + serializer.serializeToString(html);
-
-    console.log("LLEGUE????", htmlContentString)
 
     descargarHtmlComoArchivo(htmlContentString);
 
