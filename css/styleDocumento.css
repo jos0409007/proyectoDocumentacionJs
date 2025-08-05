@@ -1,0 +1,262 @@
+p {
+    text-align: justify;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+body {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+#menu li a {
+    text-decoration: none;
+}
+
+#menu,
+#listaTemas,
+#listaTemas a {
+    background-color: #042940 !important;
+    color: white !important;
+}
+
+.nav-link {
+    color: white !important;
+}
+
+.nav-link:hover {
+    background-color: rgb(255, 255, 255, 0.25);
+}
+
+.b-example-vr {
+    flex-shrink: 0;
+    width: 1.5rem;
+
+}
+
+.b-example-divider {
+    width: 0.5%;
+    background-color: rgba(0, 0, 0, .1);
+    border: solid rgba(0, 0, 0, .15);
+    border-width: 1px 0;
+    box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+}
+
+
+/* Estilos generales para todas las tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    /* Elimina el espacio entre las celdas */
+    margin-bottom: 1.5rem;
+    /* Espacio debajo de la tabla */
+    font-family: Arial, sans-serif;
+    /* Fuente legible */
+    color: #333;
+    /* Color de texto oscuro */
+    padding-bottom: 1rem;
+}
+
+/* Encabezado de la tabla */
+thead {
+    background-color: #f8f9fa;
+    /* Color de fondo claro para el encabezado */
+    border-bottom: 2px solid #dee2e6;
+    /* Borde inferior en el encabezado */
+}
+
+thead th {
+    padding: 12px 15px;
+    /* Relleno interno para los encabezados */
+    text-align: left;
+    /* Alineación del texto a la izquierda */
+    font-weight: bold;
+    /* Texto en negrita */
+    color: #495057;
+    /* Color de texto para los encabezados */
+    border: 1px solid #dee2e6;
+    /* Bordes de las celdas del encabezado */
+}
+
+/* Cuerpo de la tabla */
+tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    /* Borde inferior para cada fila del cuerpo */
+}
+
+tbody td {
+    padding: 10px 15px;
+    /* Relleno interno para las celdas de datos */
+    vertical-align: top;
+    /* Alineación vertical del contenido */
+    border: 1px solid #e9ecef;
+    /* Bordes de las celdas de datos */
+}
+
+/* Estilo para filas impares (efecto "striped") */
+tbody tr:nth-child(odd) {
+    background-color: #f2f2f2;
+    /* Color de fondo ligeramente diferente */
+}
+
+/* Estilo al pasar el ratón por encima de las filas */
+tbody tr:hover {
+    background-color: #e0e0e0;
+    /* Cambio de color al hacer hover */
+    cursor: pointer;
+    /* Cambiar el cursor a puntero */
+}
+
+/* Estilos ESPECÍFICOS para la impresión */
+@media print {
+
+    /* 1. Ajustamos el diseño de columnas */
+    .d-flex.flex-row.mb-3 {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #menu,
+    #listaTemas,
+    #listaTemas a {
+        background-color: white !important;
+        color: #042940 !important;
+    }
+
+    /* Aseguramos que los enlaces también tengan el color oscuro */
+    .nav-link {
+        color: #042940 !important;
+    }
+
+    /* 2. Estilo del índice */
+    #menu {
+        display: block !important;
+        width: 100% !important;
+        flex: none !important;
+        page-break-after: always;
+        padding: 20px !important;
+        box-sizing: border-box;
+
+        /* Estilo para que NO esté centrado y tenga un fondo blanco */
+        text-align: left;
+        /* <-- Lo volvemos a alinear a la izquierda */
+        background-color: white;
+        /* <-- Fondo blanco para el índice */
+    }
+
+    #menu h4 {
+        text-align: left;
+        /* <-- Aseguramos que el título también se alinee a la izquierda */
+        font-size: 20pt;
+        margin-bottom: 20px;
+        color: black;
+        /* <-- Color de texto para el título */
+    }
+
+    /* Le damos un poco de estilo a los enlaces del índice */
+    #menu nav {
+        text-align: left;
+        font-size: 14pt;
+        line-height: 1.8;
+    }
+
+    #menu .nav-link {
+        font-weight: normal;
+        text-decoration: none;
+        /* <-- Quitamos el subrayado */
+        color: #000;
+    }
+
+    /* 3. Estilo del contenido principal */
+    .d-inline-flex.flex-column.p-2.m-2.w-75.overflow-y-auto.vh-100 {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: unset !important;
+        width: 100% !important;
+        flex: none !important;
+        display: block !important;
+        padding: 20px !important;
+    }
+
+    /* 4. Ocultamos los divisores */
+    .b-example-divider,
+    .b-example-vr {
+        display: none !important;
+    }
+
+    /* 5. Ajustes generales para el cuerpo */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 10pt;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* 6. Evitar cortes de contenido */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        page-break-after: avoid;
+    }
+
+    p,
+    table,
+    img,
+    pre {
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    /* 7. Reglas @page para el header/footer */
+    @page {
+        margin-top: 2cm;
+        margin-bottom: 2cm;
+        margin-left: 1.5cm;
+        margin-right: 1.5cm;
+
+        @top-center {
+            content: "Transacciones en disputa";
+            font-size: 14pt;
+            font-weight: bold;
+            color: #333;
+        }
+
+        @bottom-right {
+            content: "Página " counter(page) " de " counter(pages);
+            font-size: 10pt;
+            color: #666;
+        }
+    }
+
+    /*
+     * ¡LA REGLA CLAVE PARA OCULTAR EL HEADER!
+     * @page:first aplica estilos solo a la primera página.
+     */
+    @page: first {
+        @top-center {
+            content: none;
+            /* <-- Eliminamos el contenido del header solo en la primera página */
+        }
+
+        margin-top: 1.5cm;
+        /* <-- Ajustamos el margen superior para que no haya espacio vacío */
+    }
+}

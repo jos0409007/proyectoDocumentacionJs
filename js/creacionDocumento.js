@@ -2,168 +2,7 @@ let rutaJsHihlight = 'js/highlight.min.js';
 let rutaBootstrapJs = 'js/bootstrap.min.js';
 let rutaBootstrapCss = 'css/bootstrap.css';
 let rutaDefaultCss = 'css/default.min.css';
-
-let cssEstablecido = `p {
-            text-align: justify;
-        }
-
-        body::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Hide scrollbar for IE, Edge and Firefox */
-        body {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
-        }
-
-        #menu li a {
-            text-decoration: none;
-        }
-
-        #menu,
-        #listaTemas,
-        #listaTemas a {
-            background-color: #042940 !important;
-            color: white !important;
-        }
-
-        .nav-link {
-            color: white !important;
-        }
-
-        .nav-link:hover {
-            background-color: rgb(255, 255, 255, 0.25);
-        }
-
-        .b-example-vr {
-            flex-shrink: 0;
-            width: 1.5rem;
-
-        }
-
-        .b-example-divider {
-            width: 0.5%;
-            background-color: rgba(0, 0, 0, .1);
-            border: solid rgba(0, 0, 0, .15);
-            border-width: 1px 0;
-            box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
-        }
-            
-        
-        /* Estilos generales para todas las tablas */
-        table {
-            width: 100%;
-            border-collapse: collapse; /* Elimina el espacio entre las celdas */
-            margin-bottom: 1.5rem; /* Espacio debajo de la tabla */
-            font-family: Arial, sans-serif; /* Fuente legible */
-            color: #333; /* Color de texto oscuro */
-            padding-bottom:1rem;
-        }
-
-        /* Encabezado de la tabla */
-        thead {
-            background-color: #f8f9fa; /* Color de fondo claro para el encabezado */
-            border-bottom: 2px solid #dee2e6; /* Borde inferior en el encabezado */
-        }
-
-        thead th {
-            padding: 12px 15px; /* Relleno interno para los encabezados */
-            text-align: left; /* Alineación del texto a la izquierda */
-            font-weight: bold; /* Texto en negrita */
-            color: #495057; /* Color de texto para los encabezados */
-            border: 1px solid #dee2e6; /* Bordes de las celdas del encabezado */
-        }
-
-        /* Cuerpo de la tabla */
-        tbody tr {
-            border-bottom: 1px solid #e9ecef; /* Borde inferior para cada fila del cuerpo */
-        }
-
-        tbody td {
-            padding: 10px 15px; /* Relleno interno para las celdas de datos */
-            vertical-align: top; /* Alineación vertical del contenido */
-            border: 1px solid #e9ecef; /* Bordes de las celdas de datos */
-        }
-
-        /* Estilo para filas impares (efecto "striped") */
-        tbody tr:nth-child(odd) {
-            background-color: #f2f2f2; /* Color de fondo ligeramente diferente */
-        }
-
-        /* Estilo al pasar el ratón por encima de las filas */
-        tbody tr:hover {
-            background-color: #e0e0e0; /* Cambio de color al hacer hover */
-            cursor: pointer; /* Cambiar el cursor a puntero */
-        }
-
-
-        /* Estilos ESPECÍFICOS para la impresión */
-@media print {
-    /* Anula el overflow para el div de contenido */
-    .d-inline-flex.flex-column.p-2.m-2.w-75.overflow-y-auto.vh-100 { /* Usa los selectores más específicos necesarios */
-        overflow: visible !important; /* Haz que todo el contenido sea visible */
-        height: auto !important; /* El alto se ajusta al contenido */
-        max-height: unset !important; /* Asegura que no haya límites de altura */
-        width: 100% !important; /* Ajusta el ancho si es necesario para el papel */
-        flex: none !important; /* Anula flexbox si causa problemas de ajuste */
-        display: block !important; /* Puede ayudar si d-inline-flex causa issues */
-    }
-
-    /* Ocultar elementos que no quieres en el PDF, como menús, barra lateral de navegación */
-    #menu,
-    .b-example-divider,
-    .b-example-vr,
-    #navegacionTemas {
-        display: none !important; /* Asegúrate de que no aparezcan en la impresión */
-    }
-
-    /* Ajustar el contenedor principal si aplica */
-    .container-xxl {
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    /* Ajustes generales para el cuerpo del documento impreso */
-    body {
-        margin: 0 !important; /* Elimina los márgenes del cuerpo */
-        padding: 0 !important;
-        font-size: 10pt; /* Puedes ajustar el tamaño de fuente para que quepa más */
-        -webkit-print-color-adjust: exact; /* Para Chrome/Safari: imprime colores de fondo y texto tal cual */
-        color-adjust: exact; /* Estándar */
-    }
-
-    /* Evitar cortes bruscos de contenido entre páginas */
-    h1, h2, h3, h4, h5, h6 {
-        page-break-after: avoid; /* Evita que los títulos se corten */
-    }
-    p {
-        page-break-inside: avoid; /* Evita que los párrafos se rompan si es posible */
-    }
-    table {
-        page-break-inside: auto; /* Permite que las tablas se dividan si son muy largas */
-    }
-    thead {
-        display: table-header-group; /* Hace que el encabezado de la tabla se repita en cada nueva página */
-    }
-    tr {
-        page-break-inside: avoid; /* Intenta que las filas no se rompan */
-    }
-    img {
-        max-width: 100% !important;
-        page-break-inside: avoid;
-    }
-    pre { /* Para tu código */
-        page-break-inside: avoid;
-        white-space: pre-wrap; /* Permite que el código se ajuste a la línea */
-        word-break: break-all;
-    }
-}
-                
-        `;
+let rutaCssDocumento = 'css/styleDocumento.css';
 
 
 async function downloadContent(url) {
@@ -928,7 +767,6 @@ async function crearDocumentoHtml(json = undefined) {
         ]
     }
 
-    console.log("QUE PEDOS CON ESTE JSON", json);
 
     let html = document.createElement("html");
     html.lang = "es";
@@ -958,9 +796,13 @@ async function crearDocumentoHtml(json = undefined) {
         head.append(css);
     }
 
-    let cssEditado = document.createElement("style");
-    cssEditado.textContent = cssEstablecido;
-    head.append(cssEditado);
+    let cssDocumento = await downloadContent(rutaCssDocumento);
+    if (cssDocumento){
+        let cssEditado = document.createElement("style");
+        cssEditado.textContent = cssDocumento;
+        head.append(cssEditado);
+    }
+
 
     let cssBootstrapContent = await downloadContent(rutaBootstrapCss);
     if (cssBootstrapContent) {
@@ -992,15 +834,17 @@ async function crearDocumentoHtml(json = undefined) {
     let nav = document.createElement("nav");
     nav.id = "navegacionTemas";
 
+    let divAside = crearDiv(["overflow-y-auto", "vh-100"]);
     aside.append(nav);
 
     body.append(main);
 
     main.append(divContainer);
 
+    divAside.append(aside);
     divMenu.append(h4);
     divMenu.append(hr);
-    divMenu.append(aside);
+    divMenu.append(divAside);
 
     let divDivision = crearDiv(["b-example-divider", "b-example-vr"]);
     let divContenido = crearDiv(["d-inline-flex", "flex-column", "p-2", "m-2", "w-75", "overflow-y-auto", "vh-100"]);
