@@ -873,15 +873,15 @@ async function crearDocumentoHtml(json = undefined) {
 
                 break;
             case TIPOS.lista:
-                div = crearListaHtmlDocumento(informacion);
+                div = generarContenidoListaHtml(informacion);
 
                 break;
             case TIPOS.tablaVariables:
 
-                div = crearTablaHtmlDocumento(informacion);
+                div = generarContenidoTablaHtml(informacion);
                 break;
             case TIPOS.tablaDinamica:
-                div = crearTablaHtmlDocumento(informacion);
+                div = generarContenidoTablaHtml(informacion);
                 break;
             case TIPOS.imagen:
                 div = await crearImagenHtmlDocumento(informacion);

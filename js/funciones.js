@@ -5,6 +5,7 @@ const atributo = {
   "valor": ""
 }
 
+//constante utilizada para la creacion de elementos, se utiliza en cada creacion html en los objetos informacion
 const TIPOS = {
   "texto": "texto",
   "lista": "lista",
@@ -14,14 +15,45 @@ const TIPOS = {
   "codigo": "codigo"
 }
 
+//constante para tabla de variables
+const TIPOS_VARIABLES = [
+  { "value": "string", "texto": "string (cadena)" },
+  { "value": "number", "texto": "number (número)" },
+  { "value": "date", "texto": "date (fecha)" },
+  { "value": "dateTime", "texto": "date Time (fecha y hora)" },
+  { "value": "hour", "texto": "hour (hora)" },
+  { "value": "int", "texto": "int (entero)" },
+  { "value": "double", "texto": "double (double)" },
+  { "value": "object", "texto": "object (objeto)" },
+  { "value": "list", "texto": "list|array (colección)" },
+  { "value": "bool", "texto": "bool (booleano)" },
+];
+
+//constante para tabla de variables
+const TIPOS_PARAMETROS_VARIABLES = [
+  { "value": 'entrada', "texto": "entrada" },
+  { "value": 'salida', "texto": "salida" },
+  { "value": 'entrada/salida', "texto": "entrada/salida" },
+  { "value": 'interna', "texto": "interna" },
+  { "value": "global", "texto": "global" },
+  { "value": "entorno", "texto": "entorno" }
+];
+
+//constante para tipos de lenguaje de programacion en creacion de codigo
 const LENGUAJES_PROGRAMACION = [
   { "texto": "json", "value": "language-json" },
   { "texto": "javaScript", "value": "language-javascript" },
   { "texto": "C#", "value": "language-csharp" },
   { "texto": "python", "value": "language-python" },
   { "texto": "SQL", "value": "language-sql" }
+];
+
+const TIPO_LISTA = [
+  { "value": "ul", "texto": "Lista no ordenada (UL)" },
+  { "value": "ol", "texto": "Lista ordenada (OL)" }
 ]
 
+//constante utilizada en la creacion de textos 
 const OPCIONES_TEXTO = [
   { "value": "h1", "texto": "H1" },
   { "value": "h2", "texto": "H2" },
@@ -31,6 +63,7 @@ const OPCIONES_TEXTO = [
   { "value": "p", "texto": "p" }
 ];
 
+//constante utilizada en la seccion de observaciones en creacion de texto
 const OPCIONES_OBSERVACIONES = [
   { "value": "advertencia", "texto": "advertencia" },
   { "value": "informacion", "texto": "informacion" },
@@ -733,11 +766,11 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
 
   let clasesBtn = ["btn", "btn-link", "dropdown-item", "sidebar-link"];
 
-  let dataToggle = {...atributo};
+  let dataToggle = { ...atributo };
   dataToggle.atributo = "data-bs-toggle";
   dataToggle.valor = "modal";
 
-  let dataTarget = {...atributo}
+  let dataTarget = { ...atributo }
   dataTarget.atributo = "data-bs-target";
   dataTarget.valor = "#staticBackdrop";
 
@@ -810,43 +843,43 @@ function botonesEdicionHtml(divFormularioEdicion, divActual) {
  */
 function generarContenidoTextoHTML(informacion, divFormatoEdicion = undefined) {
 
-    let div = divFormatoEdicion ?? crearDiv();
+  let div = divFormatoEdicion ?? crearDiv();
 
-    let id = generarTextoAleatorio(longitud);
+  let id = generarTextoAleatorio(longitud);
 
-    if (informacion.etiqueta == "p") {
+  if (informacion.etiqueta == "p") {
 
-        if (informacion.palabrasImportantes.trim().trimStart().trimEnd() != "") {
-            let arregloPalabras = informacion.palabrasImportantes.split(",");
-            arregloPalabras.forEach(p => {
-                informacion.texto = informacion.texto.replaceAll(p, `<strong>${p}</strong>`);
-            });
-        }
-
-        if (informacion.observaciones) {
-            let clases = informacion.tipoObservacion == "advertencia" ?
-                CLASES_TEXTO_ADVERTENCIA : informacion.tipoObservacion == "informacion" ?
-                    CLASES_TEXTO_INFORMACION : CLASES_TEXTO_PELIGRO;
-
-            clases.forEach(clase => div.classList.add(clase));
-        }
-
-        let listaTextos = informacion.texto.split("\n");
-        listaTextos.forEach(t => {
-            let textoHtml = document.createElement(informacion.etiqueta);
-            textoHtml.innerHTML = t;
-            div.append(textoHtml);
-        });
-
-    } else {
-
-        let parrafo = document.createElement(informacion.etiqueta);
-        parrafo.id = id
-        parrafo.innerHTML = informacion.texto;
-        div.append(parrafo);
+    if (informacion.palabrasImportantes.trim().trimStart().trimEnd() != "") {
+      let arregloPalabras = informacion.palabrasImportantes.split(",");
+      arregloPalabras.forEach(p => {
+        informacion.texto = informacion.texto.replaceAll(p, `<strong>${p}</strong>`);
+      });
     }
 
-    return { div: div, id: id };
+    if (informacion.observaciones) {
+      let clases = informacion.tipoObservacion == "advertencia" ?
+        CLASES_TEXTO_ADVERTENCIA : informacion.tipoObservacion == "informacion" ?
+          CLASES_TEXTO_INFORMACION : CLASES_TEXTO_PELIGRO;
+
+      clases.forEach(clase => div.classList.add(clase));
+    }
+
+    let listaTextos = informacion.texto.split("\n");
+    listaTextos.forEach(t => {
+      let textoHtml = document.createElement(informacion.etiqueta);
+      textoHtml.innerHTML = t;
+      div.append(textoHtml);
+    });
+
+  } else {
+
+    let parrafo = document.createElement(informacion.etiqueta);
+    parrafo.id = id
+    parrafo.innerHTML = informacion.texto;
+    div.append(parrafo);
+  }
+
+  return { div: div, id: id };
 }
 
 
@@ -866,7 +899,7 @@ function crearTextoHtml(informacion, divCrearParrafo) {
 
   let div = crearDiv(["parrafo"], atributos);
 
-  ({div:div} = generarContenidoTextoHTML(informacion, div));
+  ({ div: div } = generarContenidoTextoHTML(informacion, div));
 
   botonesEdicionHtml(divCrearParrafo, div);
 
@@ -885,6 +918,39 @@ function crearTextoHtml(informacion, divCrearParrafo) {
 }
 
 
+
+/**
+ * funcion que se encarga de generar una tabla html dada el objeto informacion
+ * @param {object} informacion objeto que contiene la informacion necesaria para crear una tabla html
+ * @returns HtmlDivElement, retorna el div con la tabla html generada
+ */
+function generarContenidoTablaHtml(informacion) {
+
+  let titulo = document.createElement("h4");
+  if (informacion.tituloTabla && informacion.tituloTabla != "") titulo.textContent = informacion.tituloTabla ?? '';
+
+
+  let tablaHtml = crearTablaHeader(informacion.headers);
+
+  let tbodyHtml = document.createElement("tbody");
+  CLASES_TBODY.forEach(clase => tbodyHtml.classList.add(clase));
+
+  for (const fila of informacion.detalleInformacion) {
+    let tr = crearFilaFormularioTablaHtml(fila);
+    tbodyHtml.append(tr);
+
+  }
+  tablaHtml.append(tbodyHtml);
+
+  let divTabla = crearDiv();
+  divTabla.append(titulo, tablaHtml);
+
+  return divTabla;
+
+}
+
+
+
 /**
  * funcion que crea el html final de la tabla
  * @param {list[string]} headers, es la lista de los headers que tendra la tabla
@@ -892,50 +958,13 @@ function crearTextoHtml(informacion, divCrearParrafo) {
  * @param {HtmlDivElement} divFormularioEdicion, es el div que contiene la tabla de edicion
  * @param {string} tipoTabla - recibe el tipo de tabla que se esta creando (tablaVariables, tablaDinamica)
 */
-function crearTablaHtml(headers, tabla, divFormularioEdicion, tipoTabla, tituloTabla = "") {
+function crearTablaHtml(divFormularioEdicion, informacion) {
 
-  let informacion = {
-    "tipoCreacion": tipoTabla,
-    "headers": headers,
-    "detalleInformacion": [],
-    "tituloTabla": tituloTabla
-  }
+  let divTablaHtml = generarContenidoTablaHtml(informacion); //crearDiv([], [atributoInformacion, atributoNombre]);
 
-  let titulo = document.createElement("h4");
-  if (tituloTabla && tituloTabla != "") titulo.textContent = tituloTabla;
+  divTablaHtml.setAttribute("data-informacion", JSON.stringify(informacion));
+  divTablaHtml.setAttribute("data-nombre", "tabla");
 
-
-  let tablaHtml = crearTablaHeader(headers);
-
-  let tbodyHtml = document.createElement("tbody");
-  CLASES_TBODY.forEach(clase => tbodyHtml.classList.add(clase));
-
-  let filas = tabla.querySelectorAll("tbody >tr");
-  for (const fila of filas) {
-    let columnas = fila.querySelectorAll("td >input, td >select, td >textarea");
-
-    let valores = [];
-    for (const columna of columnas) {
-      valores.push(columna.value);
-    }
-    let tr = crearFilaFormularioTablaHtml(valores);
-    informacion.detalleInformacion.push(valores);
-
-    tbodyHtml.append(tr);
-
-  }
-  tablaHtml.append(tbodyHtml);
-
-  let atributoInformacion = { ...atributo };
-  atributoInformacion.atributo = "data-informacion";
-  atributoInformacion.valor = JSON.stringify(informacion);
-
-  let atributoNombre = { ...atributo };
-  atributoNombre.atributo = "data-nombre";
-  atributoNombre.valor = "tabla";
-
-  let divTablaHtml = crearDiv([], [atributoInformacion, atributoNombre]);
-  divTablaHtml.append(titulo, tablaHtml);
 
   botonesEdicionHtml(divFormularioEdicion, divTablaHtml);
 
@@ -1033,38 +1062,48 @@ function crearCodigoHtml(divFormularioEdicion, codigo, tipoCodigo = "", titulo =
 
 }
 
-function crearListaHtml(divFormularioEdicion, tipoLista, tituloLista = "") {
+/**
+ * 
+ * @param {object} informacion es el objeto que contiene la informacion para generar la lista html
+ * @returns divListaHtml es el HTMLDivElement que contiene la lista creada
+ */
+function generarContenidoListaHtml(informacion) {
 
-  let listaHtml = document.createElement(tipoLista);
 
-  let informacion = {
-    "tipoCreacion": TIPOS.lista,
-    "tipoSelect": tipoLista,
-    "tituloLista": tituloLista,
-    "valoresLi": []
-  }
+  let listaHtml = document.createElement(informacion.tipoSelect);
 
   let titulo = document.createElement("h4");
-  if (tituloLista && tituloLista != "") {
+  if (informacion.tituloLista && informacion.tituloLista != "") {
 
-    titulo.textContent = tituloLista;
+    titulo.textContent = informacion.tituloLista;
   }
 
-
-  let inputs = divFormularioEdicion.querySelectorAll("div.miLista >div>input");
-  inputs.forEach(element => {
+  informacion.valoresLi.forEach(element => {
     let li = document.createElement("li");
-    li.textContent = element.value;
+    li.textContent = element;
     listaHtml.append(li);
-    informacion.valoresLi.push(element.value);
   });
 
-
   let divListaHtml = crearDiv(["listasHtml"]);
+  divListaHtml.append(titulo, listaHtml);
+
+
+  return divListaHtml;
+}
+
+
+/**
+ * 
+ * @param {HTMLDivElement} divFormularioEdicion Es el formulario de edicion de las listas, en este se encuentra toda la informacion del html creado
+ * @param {object} informacion es el objeto que contiene toda la informacion con la que se creara la lista html
+ */
+function crearListaHtml(divFormularioEdicion, informacion) {
+
+
+  let divListaHtml = generarContenidoListaHtml(informacion);
 
   divListaHtml.setAttribute("data-informacion", JSON.stringify(informacion));
-  divListaHtml.setAttribute("data-nombre", `lista-${tipoLista}`);
-  divListaHtml.append(titulo, listaHtml);
+  divListaHtml.setAttribute("data-nombre", `lista-${informacion.tipoSelect}`);
 
   botonesEdicionHtml(divFormularioEdicion, divListaHtml);
 
@@ -1188,12 +1227,8 @@ function agregarTexto(informacion = null) {
  **/
 function agregarLista(informacion = null) {
 
-  let tiposLista = [
-    { "value": "ul", "texto": "Lista no ordenada (UL)" },
-    { "value": "ol", "texto": "Lista ordenada (OL)" }
-  ]
+
   //primero obtengo el contenedor y opciones menu
-  let contenedor = document.getElementById("contenedor");
   let opcionesMenu = document.getElementById("opcionesMenu");
 
   //creo un divLista, este va a contener todos los elementos 
@@ -1203,7 +1238,7 @@ function agregarLista(informacion = null) {
 
   //primero que todo, creo un select el cual tiene el tipo de lista que voy a usar
 
-  let { div: divSelectLista, select: selectLista } = crearInputSelect(tiposLista, "Selecciona el tipo de lista");
+  let { div: divSelectLista, select: selectLista } = crearInputSelect(TIPO_LISTA, "Selecciona el tipo de lista");
   let { div: divTituloLista, input: inputTitulo } = crearInputText("input", "ingresa el titulo (opcional)", "titulo lista");
 
   divLista.append(divSelectLista);
@@ -1217,19 +1252,19 @@ function agregarLista(informacion = null) {
   let listaToggle = [DATA_BS_TOGGLE, DATA_BS_TRIGGER, { ...DATA_BS_CONTENT, "valor": "Agrega un nuevo item a la lista" }]
   let botonAgregarOpcion = crearButton("Agregar item", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_LISTA);
 
-  const popOverInstance = new bootstrap.Popover(botonAgregarOpcion);
+  //const popOverInstance = new bootstrap.Popover(botonAgregarOpcion);
 
   //esta funcion se encarga de crear un input y su boton para eliminar el mismo si no lo necesito
   botonAgregarOpcion.onclick = () => {
 
     let { div: divInput, input: input } = crearInputText("input", "Ingresa la descripcion de la opcion de lista", "item", false, true);
     divElementosLista.append(divInput);
-    popOverInstance.hide();
+    //popOverInstance.hide();
 
   }
+
   let divMenuBotones = crearDiv(CLASES_DIV_BOTONES_GRUPO);
 
-  //divElementosLista.appendChild(botonAgregarOpcion)
   divLista.append(divElementosLista);
 
   //se crea el boton para cancelar todo el elemento de lista que estoy creando;
@@ -1245,12 +1280,26 @@ function agregarLista(informacion = null) {
 
   botonCrearLista.onclick = function () {
 
-    crearListaHtml(divLista, selectLista.value, inputTitulo.value);
+    let informacion = {
+      "tipoCreacion": TIPOS.lista,
+      "tipoSelect": selectLista.value,
+      "tituloLista": inputTitulo.value,
+      "valoresLi": []
+    }
+
+    //let inputs = divLista.querySelectorAll("div.miLista >div>input");
+    let inputs = divElementosLista.querySelectorAll("input");
+
+    inputs.forEach(element => {
+      informacion.valoresLi.push(element.value);
+    });
+
+
+    crearListaHtml(divLista, informacion);
   }
 
   divMenuBotones.append(botonAgregarOpcion, botonCrearLista, botonCancelar);
 
-  //divLista.append(botonCrearLista, botonCancelar);
   divLista.append(divMenuBotones);
   opcionesMenu.before(divLista);
 
@@ -1267,10 +1316,59 @@ function agregarLista(informacion = null) {
       divElementosLista.append(divInput);
     });
 
-    crearListaHtml(divLista, informacion.tipoSelect);
+    crearListaHtml(divLista, informacion);
 
   }
 
+
+}
+
+
+/**
+ * 
+ * @param {object} informacion objetto que contiene la informacion de una tabla a crear
+ * @param {HTMLTableSectionElement} tbody body de la tabla a la que se le agregaran las filas con la informacion detalle
+ * @param {HtmlInputElement} inputTitulo input que se le asignara el valor del titulo de la tabla
+ * @param {list[string]} listaInputs lista de inputs que contiene la informacion de los headers
+ * @param {HtmlDivElement} div es el div de edicion
+ */
+function RecrearTablaHtmlConInformacion(informacion, tbody, inputTitulo, listaInputs, div) {
+
+  inputTitulo.value = informacion.titulo ?? "";
+
+  informacion.detalleInformacion.forEach(info => {
+
+    let tr = crearFilaFormularioTabla(listaInputs);
+    tbody.append(tr);
+
+    let inputs = tr.querySelectorAll("td >input, td >select, td >textarea");
+    info.forEach((valor, indice) => {
+      inputs[indice].value = valor;
+    })
+
+  });
+  crearTablaHtml(div, informacion);
+
+}
+/**
+ * funcion que retorna un arreglo de filas, cada fila contiene un arreglo de columnas, se utiliza para obtener todos los elementos de un tbody
+ * @param {HTMLTableSectionElement} tbody es el body de la tabla que contiene las filas con la informacion
+ * @returns detalleInformacion es un arreglo de arreglos, representan cada fila y las columnas por cada una de ellas
+ */
+function obtenerArregloColumnasTbody(tbody) {
+
+  let detalleInformacion = [];
+  let filas = tbody.querySelectorAll("tr");
+  for (const fila of filas) {
+    let columnas = fila.querySelectorAll("td >input, td >select, td >textarea");
+
+    let valores = [];
+    for (const columna of columnas) {
+      valores.push(columna.value);
+    }
+    detalleInformacion.push(valores);
+  }
+  return detalleInformacion;
 
 }
 
@@ -1281,30 +1379,9 @@ function agregarLista(informacion = null) {
  **/
 function agregarTablaVariables(informacion = null) {
 
-  let tiposVariables = [
-    { "value": "string", "texto": "string (cadena)" },
-    { "value": "number", "texto": "number (número)" },
-    { "value": "date", "texto": "date (fecha)" },
-    { "value": "dateTime", "texto": "date Time (fecha y hora)" },
-    { "value": "hour", "texto": "hour (hora)" },
-    { "value": "int", "texto": "int (entero)" },
-    { "value": "double", "texto": "double (double)" },
-    { "value": "object", "texto": "object (objeto)" },
-    { "value": "list", "texto": "list|array (colección)" },
-    { "value": "bool", "texto": "bool (booleano)" },
-  ];
 
-  let tipoParametroVariable = [
-    { "value": 'entrada', "texto": "entrada" },
-    { "value": 'salida', "texto": "salida" },
-    { "value": 'entrada/salida', "texto": "entrada/salida" },
-    { "value": 'interna', "texto": "interna" },
-    { "value": "global", "texto": "global" },
-    { "value": "entorno", "texto": "entorno" }
-  ];
-
-  let { select: inputSelectVariable } = crearInputSelect(tiposVariables, "");
-  let { select: inputSelectParametros } = crearInputSelect(tipoParametroVariable, "");
+  let { select: inputSelectVariable } = crearInputSelect(TIPOS_VARIABLES, "");
+  let { select: inputSelectParametros } = crearInputSelect(TIPOS_PARAMETROS_VARIABLES, "");
   let { input: nombre } = crearInputText("input", "ingresa el nombre", "");
   let { input: descripcion } = crearInputText("textarea", "ingresa la descripcion de la variable", "");
 
@@ -1336,7 +1413,20 @@ function agregarTablaVariables(informacion = null) {
   }
 
   let botonCrear = crearButton("Crear tabla", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CREAR);
-  botonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaVariables, inputTitulo.value);
+
+  botonCrear.onclick = function () {
+
+    let informacion = {
+      "tipoCreacion": TIPOS.tablaVariables,
+      "headers": headers,
+      "detalleInformacion": [],
+      "tituloTabla": inputTitulo.value
+    }
+    informacion.detalleInformacion = obtenerArregloColumnasTbody(tbody);
+
+    crearTablaHtml(div, informacion);
+
+  }
 
   let atributoEliminar = { ...atributo, "atributo": "data-tipo", "valor": "eliminar" };
   let buttonCancelar = crearButton("Eliminar", CLASES_BOTON_PERSONALIZADO, [atributoEliminar], CLASES_ICONO_BOTON_ELIMINAR);
@@ -1356,6 +1446,9 @@ function agregarTablaVariables(informacion = null) {
 
   if (informacion) {
 
+    RecrearTablaHtmlConInformacion(informacion, tbody, inputTitulo, listaInputs, div);
+    /*
+
     informacion.detalleInformacion.forEach(info => {
 
       let tr = crearFilaFormularioTabla(listaInputs);
@@ -1367,7 +1460,8 @@ function agregarTablaVariables(informacion = null) {
       })
 
     });
-    crearTablaHtml(headers, tabla, div, TIPOS.tablaVariables);
+    crearTablaHtml(div, informacion);
+    */
 
   }
 
@@ -1395,6 +1489,9 @@ function agregarTablaDinamica(informacion = null) {
 
 
   let divListado = crearDiv();
+  let titutlo = document.createElement("h5");
+  titutlo.textContent = "Ingresa los titulos de los headers";
+  divListado.append(titutlo);
 
   buttonAgregar.onclick = function () {
 
@@ -1417,7 +1514,7 @@ function agregarTablaDinamica(informacion = null) {
 
   }
 
-  buttonCancelar.onclick = () => eliminarDiv(div);
+  buttonCancelar.onclick = () => eliminarDiv(divHeader);
 
   div.append(divListado, buttonAgregar, buttonAceptar, buttonCancelar);
 
@@ -1483,13 +1580,30 @@ function agregarTablaDinamicaInformacion(divFormularioEdicion, headers, informac
 
   let buttonCrear = crearButton("Crear Tabla", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_CREAR);
 
-  buttonCrear.onclick = () => crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica, inputTitulo.value);
+  //() => crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica, inputTitulo.value);
+
+  buttonCrear.onclick = function () {
+
+    let informacion = {
+      "tipoCreacion": TIPOS.tablaDinamica,
+      "headers": headers,
+      "detalleInformacion": [],
+      "tituloTabla": inputTitulo.value
+    }
+    informacion.detalleInformacion = obtenerArregloColumnasTbody(tbody);
+
+    crearTablaHtml(div, informacion);
+  }
+
   div.append(divTituloTabla, tabla, buttonAgregarFila, buttonCrear, buttonActualizarHeader, buttonCancelar);
   divFormularioEdicion.before(div);
   divFormularioEdicion.remove();
 
   if (informacion) {
 
+    RecrearTablaHtmlConInformacion(informacion, tbody, inputTitulo, listaInputs, div);
+
+    /*
     inputTitulo.value = informacion.titulo ?? "";
 
     informacion.detalleInformacion.forEach(info => {
@@ -1503,7 +1617,8 @@ function agregarTablaDinamicaInformacion(divFormularioEdicion, headers, informac
       })
 
     });
-    crearTablaHtml(headers, tabla, div, TIPOS.tablaDinamica, inputTitulo.value);
+    crearTablaHtml(div, informacion);
+    */
 
   }
 
