@@ -308,7 +308,6 @@ function RegresarAEdicionElemento(divActualizar, div, agregarBtnCancelar = true)
 }
 
 
-
 /**
  * funcion que crea un boton.
  * @param {string} textContent, descripcion que aparecera en el boton creado
@@ -642,6 +641,12 @@ function crearTablaHeader(listaColumnas) {
 function crearFilaFormularioTabla(listaInputs) {
 
   let tr = document.createElement("tr");
+
+  let tdEliminar = document.createElement("td");
+  let buttonEliminar = crearButton("", CLASES_BUTTON_FORMULARIO_CANCELAR, [], CLASES_ICONO_BOTON_ELIMINAR);
+  buttonEliminar.onclick = () => tr.remove();
+  tdEliminar.append(buttonEliminar);
+
   for (let input of listaInputs) {
 
     let td = document.createElement("td");
@@ -652,6 +657,12 @@ function crearFilaFormularioTabla(listaInputs) {
     td.append(nuevoInput);
     tr.append(td);
   }
+
+  tr.onmouseenter = function(){
+    tr.append(tdEliminar);
+  }
+
+  tr.onmouseleave = () => tdEliminar.remove();
 
   return tr;
 }
