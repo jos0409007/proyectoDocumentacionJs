@@ -492,8 +492,6 @@ function crearImagen(src, alt = "", caption = "", width = 0, height = 0, clasesD
       reject(new Error("Error al cargar la imagen"));
     }
 
-
-
   });
 
 
@@ -997,9 +995,9 @@ async function generarContenidoImagenHtml(informacion) {
 
 async function crearImagenHtml(divFormularioEdicion, informacion) {
 
-  try{
+  try {
 
-    let div =  await generarContenidoImagenHtml(informacion); //crearDiv([], atributos)
+    let div = await generarContenidoImagenHtml(informacion); //crearDiv([], atributos)
     div.setAttribute("data-informacion", JSON.stringify(informacion));
     div.setAttribute("data-nombre", "imagen");
 
@@ -1014,45 +1012,54 @@ async function crearImagenHtml(divFormularioEdicion, informacion) {
 
 }
 
+/**
+ * funcion que se utiliza para generar el html que contiene las etiquetas para plasmar un codigo
+ * @param {object} informacion es el objeto que contiene la informacion para crear el html del codigo
+ * @returns HtmlDivElement es el div que contiene el codigo html
+ */
+function generarContenidoCodigoHtml(informacion) {
+
+  let div = crearDiv();
+  let pre = document.createElement("pre");
+  pre.id = generarTextoAleatorio(longitud);
+  let code = document.createElement("code");
+  if (informacion.tipoCodigo != "") code.classList.add(informacion.tipoCodigo);
+  code.textContent = informacion.codigo;
+
+  let tituloPrueba = document.createElement("h6");
+  tituloPrueba.textContent = informacion.titulo;
+  pre.append(code);
+  div.append(tituloPrueba, pre);
+
+  hljs.highlightElement(code);
+
+  return div;
+
+}
+
 
 /**
  * funcion para plasmar un codigo que quiera ser representado en la documentacion
  * esto es si es una funcion muy especifica y requiere detalle de explicacion
  * 
  * @param {HtmlDivElement} divFormularioEdicion - es el div que contiene el modo de edicion del elemento
- * @param {string} codigo - es el codigo que se va a mostrar en la documentacion
+ * @param {object} informacion - es el objeto que contiene la informacion para generar el codigo que se va a mostrar en la documentacion
  * 
 */
-function crearCodigoHtml(divFormularioEdicion, codigo, tipoCodigo = "", titulo = "") {
+function crearCodigoHtml(divFormularioEdicion, informacion) {
 
-  let informacion = {
-    "tipoCreacion": TIPOS.codigo,
-    "codigo": codigo,
-    "tipoCodigo": tipoCodigo,
-    "titulo": titulo
-  }
 
-  let div = crearDiv();
-  let pre = document.createElement("pre");
-  pre.id = generarTextoAleatorio(longitud);
+
+  let div = generarContenidoCodigoHtml(informacion);
 
   div.setAttribute("data-informacion", JSON.stringify(informacion));
   div.setAttribute("data-nombre", "codigo");
-
-  let code = document.createElement("code");
-  if (tipoCodigo != "") code.classList.add(tipoCodigo);
-  code.textContent = codigo;
-
-  let tituloPrueba = document.createElement("h6");
-  tituloPrueba.textContent = titulo;
-  pre.append(code);
-  div.append(tituloPrueba, pre);
 
   botonesEdicionHtml(divFormularioEdicion, div);
 
   divFormularioEdicion.before(div);
   divFormularioEdicion.remove();
-  hljs.highlightElement(code);
+  //hljs.highlightElement(code);
 
 }
 
@@ -1743,7 +1750,14 @@ function agregarCodigo(informacion = null) {
 
   buttonCrear.onclick = function () {
 
-    crearCodigoHtml(divFormularioEdicion, inputCodigo.value, selectLenguaje.value, inputTitulo.value);
+    let informacion = {
+      "tipoCreacion": TIPOS.codigo,
+      "codigo": inputCodigo.value,
+      "tipoCodigo": selectLenguaje.value,
+      "titulo": inputTitulo.value
+    }
+
+    crearCodigoHtml(divFormularioEdicion, informacion);
 
   }
 
@@ -1758,7 +1772,7 @@ function agregarCodigo(informacion = null) {
     selectLenguaje.value = informacion.tipoCodigo ?? "";
     inputTitulo = informacion.titulo ?? "";
 
-    crearCodigoHtml(divFormularioEdicion, informacion.codigo, informacion.tipoCodigo ?? "", informacion.titulo ?? "");
+    crearCodigoHtml(divFormularioEdicion, informacion);
   }
 
 }

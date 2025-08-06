@@ -20,135 +20,6 @@ async function downloadContent(url) {
 }
 
 
-
-function crearTextoHtmlDocumento(informacion, divFormatoEdicion = undefined) {
-
-    let div = divFormatoEdicion ?? crearDiv();
-
-    let id = generarTextoAleatorio(longitud);
-
-    if (informacion.etiqueta == "p") {
-
-        if (informacion.palabrasImportantes.trim().trimStart().trimEnd() != "") {
-            let arregloPalabras = informacion.palabrasImportantes.split(",");
-            arregloPalabras.forEach(p => {
-                informacion.texto = informacion.texto.replaceAll(p, `<strong>${p}</strong>`);
-            });
-        }
-
-        if (informacion.observaciones) {
-            let clases = informacion.tipoObservacion == "advertencia" ?
-                CLASES_TEXTO_ADVERTENCIA : informacion.tipoObservacion == "informacion" ?
-                    CLASES_TEXTO_INFORMACION : CLASES_TEXTO_PELIGRO;
-
-            clases.forEach(clase => div.classList.add(clase));
-        }
-
-        let listaTextos = informacion.texto.split("\n");
-        listaTextos.forEach(t => {
-            let textoHtml = document.createElement(informacion.etiqueta);
-            textoHtml.innerHTML = t;
-            div.append(textoHtml);
-        });
-
-    } else {
-
-        let parrafo = document.createElement(informacion.etiqueta);
-        parrafo.id = id
-        parrafo.innerHTML = informacion.texto;
-        div.append(parrafo);
-    }
-
-    return { div: div, id: parrafo.id };
-}
-
-
-
-function crearTablaHtmlDocumento(informacion) {
-
-
-    let titulo = document.createElement("h4");
-    if (informacion.tituloTabla && informacion.tituloTabla != "") titulo.textContent = informacion.tituloTabla ?? '';
-
-
-    let tablaHtml = crearTablaHeader(informacion.headers);
-
-    let tbodyHtml = document.createElement("tbody");
-    CLASES_TBODY.forEach(clase => tbodyHtml.classList.add(clase));
-
-    for (const fila of informacion.detalleInformacion) {
-        let tr = crearFilaFormularioTablaHtml(fila);
-        tbodyHtml.append(tr);
-
-    }
-    tablaHtml.append(tbodyHtml);
-
-    let divTabla = crearDiv();
-    divTabla.append(titulo, tablaHtml);
-
-    return divTabla;
-
-
-}
-
-
-async function crearImagenHtmlDocumento(informacion) {
-
-    let { img: imagen, figure: figure } = await crearImagen(informacion.src, informacion.alt, informacion.caption, informacion.width, informacion.height, [], CLASES_IMAGENES);
-
-    let div = crearDiv();
-    div.append(figure);
-
-
-    return div;
-}
-
-function crearListaHtmlDocumento(informacion) {
-
-
-    let listaHtml = document.createElement(informacion.tipoSelect);
-
-    let titulo = document.createElement("h4");
-    if (informacion.tituloLista && informacion.tituloLista != "") {
-
-        titulo.textContent = informacion.tituloLista;
-    }
-
-    informacion.valoresLi.forEach(element => {
-        let li = document.createElement("li");
-        li.textContent = element;
-        listaHtml.append(li);
-    });
-
-    let divListaHtml = crearDiv(["listasHtml"]);
-    divListaHtml.append(titulo, listaHtml);
-
-
-    return divListaHtml;
-}
-
-function crearCodigoHtmlDocumento(informacion) {
-
-    let div = crearDiv();
-    let pre = document.createElement("pre");
-    pre.id = generarTextoAleatorio(longitud);
-    let code = document.createElement("code");
-    if (informacion.tipoCodigo != "") code.classList.add(informacion.tipoCodigo);
-    code.textContent = informacion.codigo;
-
-    let tituloPrueba = document.createElement("h6");
-    tituloPrueba.textContent = informacion.titulo;
-    pre.append(code);
-    div.append(tituloPrueba, pre);
-
-    hljs.highlightElement(code);
-
-    return div;
-
-
-}
-
-
 function descargarHtmlComoArchivo(htmlString, filename = 'documento_generado_dom.html') {
     const blob = new Blob([htmlString], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
@@ -887,7 +758,7 @@ async function crearDocumentoHtml(json = undefined) {
                 div = await generarContenidoImagenHtml(informacion);
                 break;
             case TIPOS.codigo:
-                div = crearCodigoHtmlDocumento(informacion);
+                div = generarContenidoCodigoHtml(informacion);
                 break;
         }
 
