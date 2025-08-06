@@ -974,41 +974,35 @@ function crearTablaHtml(divFormularioEdicion, informacion) {
 }
 
 /**
+ * 
+ * @param {object} informacion objeto que contiene la informacion para generar el html de una imagen
+ * @returns HtmlDivElement es el div que contiene la imagen creada
+ */
+async function generarContenidoImagenHtml(informacion) {
+
+  let { img: imagen, figure: figure } = await crearImagen(informacion.src, informacion.alt, informacion.caption, informacion.width, informacion.height, [], CLASES_IMAGENES);
+
+  let div = crearDiv();
+  div.append(figure);
+
+
+  return div;
+}
+
+/**
  * funcion para crear una imagen html basado en lo registrado en el formulario de edicion
  * @param {HtmlDivElement} divFormluarioEdicion - es el elemento donde se encuentra el input para crear el html
- * @param {string} src - es el source o direccion http de donde se encuentra la imagen a mostrar 
- * @param {string} caption - es la descripcion de la imagen
- * @param {string} alt - es el texto del texto alternativo de la imagen si no llegase a cargar
+ * @param {object} informacion - es el objeto que contiene la informacion para generar el html
 */
 
-async function crearImagenHtml(divFormularioEdicion, src, alt, caption = "", width = 0, height = 0) {
+async function crearImagenHtml(divFormularioEdicion, informacion) {
 
-  try {
-    let informacion = {
-      "tipoCreacion": TIPOS.imagen,
-      "src": src,
-      "alt": alt ?? "",
-      "caption": caption ?? "",
-      "width": width ?? 0,
-      "height": height ?? 0
-    }
+  try{
 
-    let atributoInformacion = { ...atributo };
-    atributoInformacion.atributo = "data-informacion";
-    atributoInformacion.valor = JSON.stringify(informacion);
+    let div =  await generarContenidoImagenHtml(informacion); //crearDiv([], atributos)
+    div.setAttribute("data-informacion", JSON.stringify(informacion));
+    div.setAttribute("data-nombre", "imagen");
 
-    let atributoNombre = { ...atributo };
-    atributoNombre.atributo = "data-nombre";
-    atributoNombre.valor = "imagen"
-
-    let atributos = [atributoInformacion, atributoNombre];
-
-    //console.log(atributos);
-    let div = crearDiv([], atributos)
-
-    let { img: imagen, figure: figure } = await crearImagen(src, alt, caption, width, height, [], CLASES_IMAGENES);
-
-    div.append(figure);
     botonesEdicionHtml(divFormularioEdicion, div);
 
     divFormularioEdicion.before(div);
@@ -1698,7 +1692,17 @@ function agregarImagen(informacion = null) {
 
     x = imagen.width;
     y = imagen.height;
-    crearImagenHtml(divFormularioEdicion, inputImagen.value, inputAlt.value, inputCaption.value, x, y);
+
+    let informacion = {
+      "tipoCreacion": TIPOS.imagen,
+      "src": inputImagen.value,
+      "alt": inputAlt.value ?? "",
+      "caption": inputCaption.value ?? "",
+      "width": x ?? 0,
+      "height": y ?? 0
+    }
+
+    crearImagenHtml(divFormularioEdicion, informacion);
   }
 
   buttonCancelar.onclick = () => eliminarDiv(divFormularioEdicion);
@@ -1719,7 +1723,7 @@ function agregarImagen(informacion = null) {
     y = informacion.height;
 
     buttonCargar.click();
-    crearImagenHtml(divFormularioEdicion, informacion.src, inputAlt.value, inputCaption.value);
+    crearImagenHtml(divFormularioEdicion, informacion);
   }
 
 }

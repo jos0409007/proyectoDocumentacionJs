@@ -884,7 +884,7 @@ async function crearDocumentoHtml(json = undefined) {
                 div = generarContenidoTablaHtml(informacion);
                 break;
             case TIPOS.imagen:
-                div = await crearImagenHtmlDocumento(informacion);
+                div = await generarContenidoImagenHtml(informacion);
                 break;
             case TIPOS.codigo:
                 div = crearCodigoHtmlDocumento(informacion);
