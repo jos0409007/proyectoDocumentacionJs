@@ -190,59 +190,6 @@ function crearInputGroup(input, descripcionLabel, labelButton, func) {
 */
 
 /**
- * funcion que crea un input de tipo texto
- * @param {string} elemento recibe la etiqueta, puede ser input o textarea
- * @param {string} placeholder - es el texto que tendra el input
- * @param {string} descripcionLabel - es el texto que tendra el label asignado al input
- * @param {bool} requierd - es el campo que define si el input es necesario, su valor por defecto es true
- * @param {bool} botonEliminar - variable que define si se agregara un boton para tener la opcion de eliminar el elemento creado.
- * @returns {object} retorna un objeto del estilo { div: div, input: input }
-*/
-function crearInputText(elemento, placeholder, descripcionLabel, required = true, botonEliminar = false) {
-
-  id = generarTextoAleatorio(longitud);
-  let div = undefined; //crearDiv(CLASES_DIV_FORMULARIO);
-
-  let input = document.createElement(elemento);
-  input.id = id;
-  input.placeholder = placeholder;
-  input.required = required;
-  CLASES_INPUT_TEXTO.forEach(clase => input.classList.add(clase));
-
-
-  if (!botonEliminar) {
-    div = crearDiv(CLASES_DIV_FORMULARIO);
-    let label = document.createElement("label");
-    label.setAttribute("for", id);
-    label.textContent = descripcionLabel;
-
-    CLASES_LABEL_TEXTO.forEach(clase => label.classList.add(clase));
-
-    div.append(label);
-    div.append(input);
-
-  } else {
-
-    div = crearDiv(CLASES_DIV_FORMLUARIO_GRUPO);
-    let span = document.createElement("span");
-    CLASES_INPUT_TEXTO_GRUPO_SPAN.forEach(clase => span.classList.add(clase));
-    span.textContent = descripcionLabel;
-    input.setAttribute("aria-describedby", "inputGroup-sizing-sm");
-    div.append(span, input);
-    let buttonEliminar = crearButton("", CLASES_BUTTON_FORMULARIO_CANCELAR, [], CLASES_ICONO_BOTON_CANCELAR);
-    buttonEliminar.onclick = () => eliminarDiv(div);
-    div.append(buttonEliminar);
-
-  }
-
-
-
-  return { div: div, input: input };
-
-
-}
-
-/**
  * funcion para crear un div, al que le enviare una lista de clases y una lista de atributos segun sea necesario
  * @param {list[string]} clases - una lista de strings, cada string representa una clase a agregar
  * @param {list[object]} atributos - lista de objetos con claves {atributo, valor}, deben ser extendidos del objeto atributo
@@ -307,7 +254,6 @@ function RegresarAEdicionElemento(divActualizar, div, agregarBtnCancelar = true)
 
 }
 
-
 /**
  * funcion que crea un boton.
  * @param {string} textContent, descripcion que aparecera en el boton creado
@@ -336,6 +282,95 @@ function crearButton(textContent, clases = [], atributos = [], clasesBi = []) {
 
   return button
 }
+
+
+/**
+ * funcion que crea un input de tipo texto
+ * @param {string} elemento recibe la etiqueta, puede ser input o textarea
+ * @param {string} placeholder - es el texto que tendra el input
+ * @param {string} descripcionLabel - es el texto que tendra el label asignado al input
+ * @param {bool} requierd - es el campo que define si el input es necesario, su valor por defecto es true
+ * @param {bool} botonEliminar - variable que define si se agregara un boton para tener la opcion de eliminar el elemento creado.
+ * @returns {object} retorna un objeto del estilo { div: div, input: input }
+*/
+function crearInputText(elemento, placeholder, descripcionLabel, required = true, botonEliminar = false) {
+
+  id = generarTextoAleatorio(longitud);
+  let div = undefined; //crearDiv(CLASES_DIV_FORMULARIO);
+
+  let input = document.createElement(elemento);
+  input.id = id;
+  input.placeholder = placeholder;
+  input.required = required;
+  CLASES_INPUT_TEXTO.forEach(clase => input.classList.add(clase));
+
+
+  if (!botonEliminar) {
+    div = crearDiv(CLASES_DIV_FORMULARIO);
+    let label = document.createElement("label");
+    label.setAttribute("for", id);
+    label.textContent = descripcionLabel;
+
+    CLASES_LABEL_TEXTO.forEach(clase => label.classList.add(clase));
+
+    div.append(label);
+    div.append(input);
+
+  } else {
+
+    div = crearDiv(CLASES_DIV_FORMLUARIO_GRUPO);
+    let span = document.createElement("span");
+    CLASES_INPUT_TEXTO_GRUPO_SPAN.forEach(clase => span.classList.add(clase));
+    span.textContent = descripcionLabel;
+    input.setAttribute("aria-describedby", "inputGroup-sizing-sm");
+    div.append(span, input);
+    let buttonEliminar = crearButton("", CLASES_BUTTON_FORMULARIO_CANCELAR, [], CLASES_ICONO_BOTON_CANCELAR);
+    buttonEliminar.onclick = () => eliminarDiv(div);
+    div.append(buttonEliminar);
+
+  }
+
+
+
+  return { div: div, input: input };
+
+
+}
+
+
+/**
+ * funcion que crea un input de tipo texto
+ * @param {string} descripcionLabel - es el texto que tendra el label asignado al input
+ * @returns {object} retorna un objeto del estilo { div: div, input: input }
+*/
+function crearInputFile(descripcionLabel) {
+
+  id = generarTextoAleatorio(longitud);
+  let div = undefined; //crearDiv(CLASES_DIV_FORMULARIO);
+
+  let input = document.createElement("input");
+  input.id = id;
+  input.placeholder = placeholder;
+  input.required = required;
+  input.type = "file";
+
+  CLASES_INPUT_TEXTO.forEach(clase => input.classList.add(clase));
+  div = crearDiv(CLASES_DIV_FORMULARIO);
+  let label = document.createElement("label");
+  label.setAttribute("for", id);
+  label.textContent = descripcionLabel;
+
+  CLASES_LABEL_TEXTO.forEach(clase => label.classList.add(clase));
+
+  div.append(label);
+  div.append(input);
+
+  return { div: div, input: input };
+
+
+}
+
+
 
 /**
  * recibe como parametro una lista|arreglo de objetos {"value":str, "texto":str}
