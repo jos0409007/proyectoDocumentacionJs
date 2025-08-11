@@ -350,8 +350,6 @@ function crearInputFile(descripcionLabel) {
 
   let input = document.createElement("input");
   input.id = id;
-  input.placeholder = placeholder;
-  input.required = required;
   input.type = "file";
 
   CLASES_INPUT_TEXTO.forEach(clase => input.classList.add(clase));

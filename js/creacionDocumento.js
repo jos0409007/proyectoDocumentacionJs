@@ -668,7 +668,7 @@ async function crearDocumentoHtml(json = undefined) {
     }
 
     let cssDocumento = await downloadContent(rutaCssDocumento);
-    if (cssDocumento){
+    if (cssDocumento) {
         let cssEditado = document.createElement("style");
         cssEditado.textContent = cssDocumento;
         head.append(cssEditado);
@@ -804,6 +804,24 @@ document.addEventListener("DOMContentLoaded", () => {
             crearDocumentoHtml()
         });
     }
+
+    let cargaJson = document.getElementById("cargaJsonFF");
+    cargaJson.addEventListener("click", function () {
+
+        let titulo = document.getElementById("tituloModal");
+        titulo.textContent = "Carga de proyecto";
+        let body = document.getElementById("modal-body");
+        body.innerHTML = "";
+
+        let { div: div, input: input } = crearInputFile("Selecciona el proyecto");
+
+        let buttonCargar = crearButton("Cargar", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_AGREGAR)
+        buttonCargar.onclick = function(){
+            alert(input.value);
+        }
+        body.append(div, buttonCargar);
+    });
+
 });
 
 

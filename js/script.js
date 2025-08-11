@@ -20,7 +20,7 @@ function cambiarColor(theme) {
 
 let temaOscuro = document.getElementById("temaOscuro");
 let temaClaro = document.getElementById("temaClaro");
-let cargaJson = document.getElementById("cargaJsonFF");
+
 
 temaClaro.addEventListener("click", function(){
     let cssClaro = document.getElementById("cssClaro");
@@ -38,13 +38,3 @@ temaOscuro.addEventListener("click", function(){
 });
 
 
-cargaJson.addEventListener("click", function(){
-
-    let titulo = document.getElementById("tituloModal");
-    titulo.textContent = "Carga de proyecto";
-    let body = document.getElementById("modal-body");
-    body.innerHTML = "";
-
-    let {div:div, input:input} = crearInputFile("Selecciona el proyecto");
-    body.append(div);
-});
