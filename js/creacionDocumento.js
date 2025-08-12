@@ -814,10 +814,39 @@ document.addEventListener("DOMContentLoaded", () => {
         body.innerHTML = "";
 
         let { div: div, input: input } = crearInputFile("Selecciona el proyecto");
+        input.setAttribute("accept", ".json");
 
         let buttonCargar = crearButton("Cargar", CLASES_BOTON_PERSONALIZADO, [], CLASES_ICONO_BOTON_AGREGAR)
-        buttonCargar.onclick = function(){
-            alert(input.value);
+        buttonCargar.onclick = function () {
+
+            const file = input.files[0];
+
+            //console.log(file);
+
+            if (!file) {
+                alert("Por favor, selecciona un archivo.");
+                return;
+            }
+
+            // Creamos una instancia de FileReader para leer el archivo
+            const reader = new FileReader();
+
+            // Esta es la parte importante: el código se ejecutará cuando el archivo se haya leído.
+            reader.onload = function (event) {
+                try {
+                    // Intenta analizar el contenido del archivo como JSON
+                    const jsonContent = JSON.parse(event.target.result);
+
+                    recuperarDocumentacion(jsonContent);
+                    let modal = document.getElementById("cerrarModal");
+                    modal.click();
+
+                } catch (error) {
+                    alert("Error: El archivo no es un JSON válido.");
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
         }
         body.append(div, buttonCargar);
     });
