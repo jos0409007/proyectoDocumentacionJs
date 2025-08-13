@@ -691,7 +691,7 @@ function crearFilaFormularioTabla(listaInputs) {
     tr.append(td);
   }
 
-  tr.onmouseenter = function(){
+  tr.onmouseenter = function () {
     tr.append(tdEliminar);
   }
 
@@ -1821,9 +1821,10 @@ function agregarCodigo(informacion = null) {
 
 }
 
-function crearJson() {
+async function crearJson(titulo = "") {
 
   let documentacion = {
+    "titulo": titulo,
     "elementos": []
   };
 
@@ -1835,25 +1836,64 @@ function crearJson() {
     documentacion.elementos.push(JSON.parse(div.dataset.informacion));
   })
 
-  descargaJson(documentacion, "archivo");
+  await descargaJson(documentacion, titulo.replaceAll(" ", "_"));
 
 }
 
-function descargaJson(json, nombreArchivo) {
+async function descargaJson(json, nombreArchivo) {
 
   let jsonString = JSON.stringify(json, null, 2); // Convertir a string con formato
   let blob = new Blob([jsonString], { type: 'application/json' }); // Crear un Blob
-  let url = URL.createObjectURL(blob); // Crear una URL para el Blob
+  if ('showSaveFilePicker' in window) {
+    try {
+      // Crea el contenido del archivo que quieres guardar
 
-  let enlaceDescarga = document.createElement('a'); // Crear un enlace de descarga
-  enlaceDescarga.href = url;
-  enlaceDescarga.download = nombreArchivo + '.json'; // Nombre del archivo
+      // Abre el diálogo "Guardar como..." y sugiere un nombre
+      const fileHandle = await window.showSaveFilePicker({
+        suggestedName: nombreArchivo,
+        types: [{
+          description: 'Archivo json',
+          accept: {
+            'application/json': ['.json'],
+          },
+        }],
+      });
 
-  document.body.appendChild(enlaceDescarga); // Agregar el enlace al DOM
-  enlaceDescarga.click(); // Simular un clic en el enlace
+      // Obtiene un objeto para escribir en el archivo
+      const writableStream = await fileHandle.createWritable();
 
-  document.body.removeChild(enlaceDescarga); // Eliminar el enlace del DOM
-  URL.revokeObjectURL(url); // Liberar la URL del Blob
+      // Escribe el contenido en el archivo
+      await writableStream.write(blob);
+
+      // Cierra el archivo para guardar los cambios
+      await writableStream.close();
+
+    } catch (error) {
+      // Maneja los errores, como si el usuario cancela el diálogo
+      if (error.name === 'AbortError') {
+
+      } else {
+
+        console.error('Error al usar showSaveFilePicker:', error);
+      }
+    }
+  } else {
+
+
+    let url = URL.createObjectURL(blob); // Crear una URL para el Blob
+
+    let enlaceDescarga = document.createElement('a'); // Crear un enlace de descarga
+    enlaceDescarga.href = url;
+    enlaceDescarga.download = nombreArchivo + '.json'; // Nombre del archivo
+
+    document.body.appendChild(enlaceDescarga); // Agregar el enlace al DOM
+    enlaceDescarga.click(); // Simular un clic en el enlace
+
+    document.body.removeChild(enlaceDescarga); // Eliminar el enlace del DOM
+    URL.revokeObjectURL(url); // Liberar la URL del Blob
+
+    console.warn('La API showSaveFilePicker no está disponible.');
+  }
 
 }
 
