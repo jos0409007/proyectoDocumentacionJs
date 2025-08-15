@@ -27,6 +27,26 @@ async function downloadContent(url) {
     }
 }
 
+async function downloadContentBlob(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const blob = await response.blob();
+    return blob;
+}
+
+function convertirArchivoABase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
+
+
+
 /**
  * funcion que crea un blob con el contenido html y luego descarga el archivo con todo el contenido 
  * @param {string} htmlString es el html en formato string con el que se va a crear el html
@@ -119,7 +139,8 @@ async function crearDocumentoHtml(json = undefined) {
     let cssDocumento = await downloadContent(rutaCssDocumento);
     if (cssDocumento) {
         let cssEditado = document.createElement("style");
-        cssEditado.textContent = cssDocumento;
+        let tituloDoc = `${json.titulo}`;
+        cssEditado.textContent = cssDocumento.replace(/{titulo_documento}/g, tituloDoc);
         head.append(cssEditado);
     }
 
@@ -204,6 +225,13 @@ async function crearDocumentoHtml(json = undefined) {
                 div = generarContenidoTablaHtml(informacion);
                 break;
             case TIPOS.imagen:
+
+                const urlImagen = informacion.src;
+                
+                const blob = await downloadContentBlob(urlImagen);
+                const base64 = await convertirArchivoABase64(blob);
+                informacion.src = base64
+
                 div = await generarContenidoImagenHtml(informacion);
                 break;
             case TIPOS.codigo:

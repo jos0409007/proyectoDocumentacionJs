@@ -231,12 +231,19 @@ tbody tr:hover {
         margin-bottom: 2cm;
         margin-left: 1.5cm;
         margin-right: 1.5cm;
-
+        /*
         @top-center {
-            content: "Transacciones en disputa";
+            content: "{titulo_documento}";
             font-size: 14pt;
             font-weight: bold;
             color: #333;
+        }*/
+        @top-right{
+            content: "{titulo_documento}";
+            font-size: 12pt;
+            font-weight: bold;
+            color: #666;
+            font-family: Arial, Helvetica, sans-serif
         }
 
         @bottom-right {
@@ -251,8 +258,8 @@ tbody tr:hover {
      * @page:first aplica estilos solo a la primera página.
      */
     @page: first {
-        @top-center {
-            content: none;
+        @top-right {
+            content: none !important;
             /* <-- Eliminamos el contenido del header solo en la primera página */
         }
 

@@ -503,12 +503,13 @@ function crearImagen(src, alt = "", caption = "", width = 0, height = 0, clasesD
 
     clasesImagen.forEach(clase => imagen.classList.add(clase));
 
-    imagen.onload = null;
-    imagen.onerror = null;
-    imagen.src = src;
 
-    imagen.onload = function () {
-      imagen.alt = alt
+    const esBase64 = src.startsWith('data:');
+
+    if (esBase64) {
+
+      imagen.src = src;
+      imagen.alt = alt;
       imagen.loading = "lazy";
       imagen.decoding = "async";
       figcaption.textContent = caption;
@@ -518,14 +519,35 @@ function crearImagen(src, alt = "", caption = "", width = 0, height = 0, clasesD
       figure.append(imagen, figcaption);
       divImagen.append(figure);
       resolve({ div: divImagen, img: imagen, figure: figure });
+
+    } else {
+
+
+      imagen.onload = null;
+      imagen.onerror = null;
+      imagen.src = src;
+
+      imagen.onload = function () {
+        imagen.alt = alt
+        imagen.loading = "lazy";
+        imagen.decoding = "async";
+        figcaption.textContent = caption;
+        figcaption.style.textAlign = "center";
+        if (width !== 0) imagen.width = width;
+        if (height !== 0) imagen.height = height;
+        figure.append(imagen, figcaption);
+        divImagen.append(figure);
+        resolve({ div: divImagen, img: imagen, figure: figure });
+      }
+
+      imagen.onerror = function () {
+        reject(new Error("Error al cargar la imagen"));
+      }
+
     }
 
-    imagen.onerror = function () {
-      reject(new Error("Error al cargar la imagen"));
-    }
 
   });
-
 
 }
 
